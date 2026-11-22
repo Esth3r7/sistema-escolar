@@ -1,0 +1,15 @@
+{
+  "name": "plataforma-educativa",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sistema de gestión escolar (demo local)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}

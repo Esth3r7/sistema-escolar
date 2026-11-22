@@ -1,0 +1,1042 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Sistema de Gestión Escolar</title><style>/* Colores, tipografía, bordes y sombras: cambia aquí y se actualiza toda la app */
+:root{
+  --c-primary:#1d4ed8; --c-primary-dark:#1e3a8a; --c-accent:#0ea5e9;
+  --c-ok:#16a34a; --c-warn:#f59e0b; --c-bad:#dc2626; --c-info:#2563eb;
+  --c-bg:#f1f5f9; --c-card:#fff; --c-text:#1f2937; --c-muted:#6b7280; --c-line:#e5e7eb;
+  --c-side:#0b1220; --c-side-text:#cbd5e1;
+  --font:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+  --radius:10px; --shadow:0 2px 10px rgba(15,23,42,.08);
+  --gap:1rem; --side-w:250px; --top-h:58px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--c-bg);color:var(--c-text);font-size:15px}
+button,input,select,textarea{font:inherit}
+.hidden{display:none!important}.grow{flex:1}
+/* Menú lateral */
+.side{position:fixed;inset:0 auto 0 0;width:var(--side-w);background:var(--c-side);color:var(--c-side-text);display:flex;flex-direction:column;z-index:30;overflow-y:auto;transition:transform .25s}
+.brand{display:flex;align-items:center;gap:.6rem;padding:0 1rem;min-height:var(--top-h);background:rgba(0,0,0,.25);color:#fff;font-weight:700}
+.brand img{width:30px;height:30px;object-fit:contain}
+.user{display:flex;gap:.75rem;align-items:center;padding:1rem;border-bottom:1px solid rgba(255,255,255,.08);color:#fff}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--c-primary);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.avatar.lg{width:64px;height:64px;font-size:1.5rem}
+.user small{display:block;color:#4ade80}
+.sq{margin:.75rem;padding:.55rem .75rem;border-radius:8px;border:0;background:rgba(255,255,255,.08);color:#fff;min-height:40px;width:calc(100% - 1.5rem)}
+.gt{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.9rem 1rem .3rem;color:#7f8ea3}
+.side a{display:flex;gap:.7rem;align-items:center;padding:.7rem 1rem;color:inherit;text-decoration:none;min-height:44px;border-left:3px solid transparent}
+.side a:hover{background:rgba(255,255,255,.06)}
+.side a.on{background:rgba(8,145,178,.25);border-left-color:var(--c-primary);color:#fff}
+.main{margin-left:var(--side-w);min-height:100vh}
+.top{height:var(--top-h);background:var(--c-primary);color:#fff;display:flex;align-items:center;gap:.75rem;padding:0 1.25rem;position:sticky;top:0;z-index:20;box-shadow:var(--shadow)}
+.top .chip{background:rgba(255,255,255,.2);color:#fff}
+.top .btn.ghost{color:#fff;border-color:rgba(255,255,255,.5)}
+.iconbtn{background:none;border:0;color:#fff;font-size:1.3rem;cursor:pointer;position:relative;min-width:44px;min-height:44px}
+.iconbtn i{position:absolute;top:4px;right:4px;background:var(--c-bad);font-size:.65rem;font-style:normal;border-radius:99px;padding:1px 5px}
+#burger{display:none}.ov{display:none}
+#view{padding:1.25rem;max-width:1300px;margin:auto}
+h2.pt{margin:.2rem 0 1rem;font-size:1.3rem}
+/* Componentes */
+.chip{background:#e0f2fe;color:var(--c-primary-dark);border-radius:999px;padding:.25rem .75rem;font-size:.8rem;white-space:nowrap}
+.card{background:var(--c-card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:var(--gap);border-top:3px solid var(--c-primary)}
+.card h3{margin:0 0 .8rem}
+.grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-bottom:var(--gap)}
+.stat{display:flex;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:#fff}
+.stat .ic{width:76px;display:grid;place-items:center;font-size:1.8rem;color:#fff}
+.stat div.t{padding:.9rem 1rem}.stat small{color:var(--c-muted)}.stat b{display:block;font-size:1.35rem}
+.s1 .ic{background:#0891b2}.s2 .ic{background:#2563eb}.s3 .ic{background:#f59e0b}.s4 .ic{background:#7c3aed}.s5 .ic{background:#16a34a}.s6 .ic{background:#dc2626}
+.btn{background:var(--c-primary);color:#fff;border:0;border-radius:8px;padding:.6rem 1rem;cursor:pointer;min-height:42px}
+.btn:hover{background:var(--c-primary-dark)}.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--c-primary);border:1px solid var(--c-line)}
+.btn.ok{background:var(--c-ok)}.btn.bad{background:var(--c-bad)}.btn.warn{background:var(--c-warn)}.btn.sm{padding:.3rem .65rem;min-height:34px}
+.form{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.form label{display:flex;flex-direction:column;gap:.25rem;font-size:.82rem;color:var(--c-muted)}
+input,select,textarea{padding:.6rem;border:1px solid #d1d5db;border-radius:8px;background:#fff;min-height:42px;width:100%;color:var(--c-text)}
+.actions,.tools{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0;align-items:center}
+.tools .q{max-width:280px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{text-align:left;padding:.65rem .7rem;border-bottom:1px solid var(--c-line)}
+th{background:#f8fafc;color:#475569;font-size:.78rem;text-transform:uppercase}
+tbody tr:hover{background:#f8fafc}
+.pager{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;color:var(--c-muted);font-size:.85rem;padding-top:.6rem}
+.empty{text-align:center;color:var(--c-muted);padding:2rem}
+.bd{display:inline-block;border-radius:6px;padding:.15rem .55rem;font-size:.75rem;font-weight:600;color:#fff}
+.bd.ok{background:var(--c-ok)}.bd.warn{background:var(--c-warn)}.bd.bad{background:var(--c-bad)}.bd.info{background:var(--c-info)}.bd.gray{background:#64748b}
+.two{display:grid;gap:var(--gap);grid-template-columns:1fr 1fr}
+.pills{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.pill{border:0;border-radius:8px;color:#fff;padding:.6rem 1rem;cursor:pointer;opacity:.6;min-height:42px}.pill.on{opacity:1;box-shadow:var(--shadow)}
+.c1{background:#dc2626}.c2{background:#2563eb}.c3{background:#0f172a}.c4{background:#f59e0b}
+.course{border:1px solid var(--c-line);border-radius:var(--radius);padding:.9rem;cursor:pointer;background:#fff}.course:hover,.course.on{border-color:var(--c-primary);box-shadow:var(--shadow)}
+.sch{min-width:760px}.sch th{text-align:center}.sch td{vertical-align:top;height:64px;padding:.25rem}
+.blk{border-radius:8px;padding:.35rem .5rem;color:#fff;font-size:.78rem;margin-bottom:3px}.blk small{display:block;opacity:.9}
+.post{border-left:4px solid var(--c-accent);padding:.75rem 1rem;margin:.75rem 0;background:#f8fafc;border-radius:0 10px 10px 0}.post.tarea{border-color:var(--c-warn)}
+.rank{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--c-line)}.pts{margin-left:auto;font-weight:700;color:var(--c-primary)}
+.profile{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}.profile small{color:var(--c-muted)}
+.logo-prev{width:80px;height:80px;object-fit:contain;border:1px dashed var(--c-line);border-radius:12px}
+.tabsb{display:flex;gap:.25rem;border-bottom:2px solid var(--c-line);margin-bottom:1rem}.tabsb button{background:none;border:0;padding:.7rem 1rem;cursor:pointer;color:var(--c-muted);border-bottom:3px solid transparent;margin-bottom:-2px}.tabsb button.on{color:var(--c-primary);border-color:var(--c-primary);font-weight:700}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:grid;place-items:center;z-index:100;padding:1rem}
+.mbox{background:#fff;border-radius:12px;width:100%;max-width:560px;max-height:92vh;display:flex;flex-direction:column}.mbox.wide{max-width:760px}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--c-line)}.mh .x{background:none;border:0;font-size:1.2rem;cursor:pointer;min-width:40px;min-height:40px}
+.mb{padding:1.25rem;overflow-y:auto}.mf{display:flex;justify-content:flex-end;gap:.5rem;padding:1rem 1.25rem;border-top:1px solid var(--c-line)}
+/* Login */
+.login{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr;background:#fff}
+.hero{background:linear-gradient(145deg,#0e7490,#164e63);color:#fff;padding:3rem;display:flex;flex-direction:column;justify-content:center;gap:1rem}
+.hero h1{margin:0;font-size:2rem}.hero li{margin:.4rem 0}
+.lbox{display:grid;place-items:center;padding:2rem}.lbox>div{width:100%;max-width:380px}
+.demo{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.75rem}.demo button{text-align:left;line-height:1.3}
+.err{color:var(--c-bad);font-size:.85rem;min-height:1.2em}
+@media (max-width:900px){
+  .side{transform:translateX(-100%)}body.nav .side{transform:none}
+  body.nav .ov{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:25}
+  .main{margin-left:0}#burger{display:block}.two{grid-template-columns:1fr}
+  .login{grid-template-columns:1fr}.hero{display:none}
+}
+@media (max-width:560px){#view{padding:.75rem}.top{padding:0 .5rem}.top .chip.hide{display:none}.stat .ic{width:60px}}
+@media print{.side,.top,.tools,.actions,.pager,.ov{display:none!important}.main{margin:0}.card{box-shadow:none}}
+/* Tema azul */
+.top{background:linear-gradient(90deg,#1e3a8a,#1d4ed8)}
+.side a.on{background:rgba(59,130,246,.28);border-left-color:#60a5fa}
+.hero{background:linear-gradient(145deg,#0f172a,#1e3a8a 55%,#0ea5e9)}
+.chip{background:#dbeafe;color:#1e3a8a}
+.s1 .ic{background:#1d4ed8}.s2 .ic{background:#0ea5e9}.s4 .ic{background:#4f46e5}
+.btn{box-shadow:0 1px 2px rgba(30,58,138,.25)}
+.card{border-top-color:#2563eb}
+th{background:#eff6ff;color:#1e3a8a}
+.hint{font-size:.8rem;color:var(--c-muted);background:#eff6ff;border-radius:8px;padding:.6rem .75rem;margin-top:.75rem}
+/* Menú desplegable, KPIs, gráficos y vistas por rol */
+.side{background:linear-gradient(180deg,#1e2a78,#1e1b6b 60%,#17195a)}
+.grp .gh{width:100%;display:flex;align-items:center;gap:.7rem;background:none;border:0;color:inherit;padding:.7rem 1rem;cursor:pointer;min-height:44px;text-align:left}
+.grp .gh span:nth-child(2){flex:1}.grp .gh i{font-style:normal;transition:.2s;font-size:.8rem}.grp.open .gh i{transform:rotate(180deg)}
+.grp .gc{display:none;padding:0 0 .4rem}.grp.open .gc{display:block}.grp .gc a{padding:.5rem 1rem .5rem 3.2rem;min-height:38px;font-size:.9rem}
+.grp.open>.gh{color:#fff}
+.side a.top1{min-height:44px}
+.side nav{padding:.5rem}.side a,.grp .gh{border-radius:8px}.side a.on{background:#3b5bdb;color:#fff;border-left-color:transparent}
+.kpis{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:var(--gap)}
+.kpi{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem;border:1px solid var(--c-line)}
+.kpi small{color:var(--c-muted);display:block;min-height:2.4em}.kpi b{font-size:1.7rem;display:block;margin:.2rem 0}.kpi .spark{width:100%;height:42px}
+.kpi.al{border-color:#fbbf24}.kpi.al b{color:#b45309}.kpi.good b{color:var(--c-ok)}
+.cols{display:grid;gap:var(--gap);grid-template-columns:2fr 1fr;align-items:start}
+.cols3{display:grid;gap:var(--gap);grid-template-columns:1fr 1.3fr 1fr;align-items:start}
+.cols2{display:grid;gap:var(--gap);grid-template-columns:1fr 1fr;align-items:start}
+.ccards{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.cc{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--c-line)}.cc.on{outline:2px solid var(--c-primary)}
+.cc .bn{height:84px;display:grid;place-items:center;font-size:2rem;color:#fff}.cc .bd2{padding:.8rem}.cc .bd2 small{color:var(--c-muted);display:block;margin-bottom:.5rem}
+.cc .row{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.ring{--s:38px;width:var(--s);height:var(--s);border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#e2e8f0 0);display:grid;place-items:center;position:relative;flex:none}
+.ring::before{content:'';position:absolute;inset:5px;background:#fff;border-radius:50%}.ring b{position:relative;font-size:.62rem}
+.donut{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;margin:.5rem auto}.donut span{width:68%;height:68%;background:#fff;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.3rem}
+.legend{display:grid;gap:.25rem;font-size:.85rem}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.4rem}
+.tl{border-left:2px solid #bfdbfe;margin-left:.6rem;padding-left:1rem}.tl>div{position:relative;background:#eff6ff;border-radius:10px;padding:.7rem .9rem;margin-bottom:.7rem}.tl>div::before{content:'';position:absolute;left:-1.45rem;top:1rem;width:10px;height:10px;border-radius:50%;background:var(--c-primary)}
+.tl small{color:var(--c-muted)}
+.chk{display:flex;align-items:center;gap:.6rem;padding:.55rem .2rem;border-bottom:1px solid var(--c-line)}.chk .box{width:20px;height:20px;border-radius:5px;border:2px solid #94a3b8;display:grid;place-items:center;font-size:.8rem;flex:none}.chk.done .box{background:var(--c-ok);border-color:var(--c-ok);color:#fff}
+.welcome{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}.welcome h2{margin:0}
+.sel{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:10px;padding:.5rem .9rem;font-size:.9rem}
+.bars{display:flex;align-items:flex-end;gap:.6rem;height:150px;padding-top:.5rem}.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;height:100%;justify-content:flex-end}.bars span{width:100%;display:flex;gap:2px;align-items:flex-end;height:120px}.bars em{flex:1;border-radius:4px 4px 0 0;min-height:2px}
+#kidsel{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);max-width:230px;min-height:38px}#kidsel option{color:#000}
+/* Login */
+.lg2{min-height:100vh;display:grid;grid-template-columns:1.15fr 1fr;background:#f1f5f9}
+.lg2 .brandp{background:linear-gradient(150deg,#0b1a5c,#1e3a8a 55%,#2563eb);color:#fff;padding:3rem;display:flex;flex-direction:column;justify-content:center;gap:1rem;position:relative;overflow:hidden}
+.lg2 .brandp::after{content:'';position:absolute;right:-120px;bottom:-120px;width:360px;height:360px;border-radius:50%;background:rgba(255,255,255,.07)}
+.lg2 .mark{width:76px;height:76px;border-radius:20px;background:#fff;color:#1e3a8a;display:grid;place-items:center;font-size:2rem;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.lg2 .brandp h1{margin:0;font-size:2.1rem}.lg2 .brandp li{margin:.5rem 0;opacity:.95}
+.lg2 .fp{display:grid;place-items:center;padding:2rem}.lg2 .fb{background:#fff;border-radius:18px;box-shadow:0 20px 40px rgba(15,23,42,.12);padding:2.2rem;width:100%;max-width:410px}
+.lg2 .fb h2{margin:0 0 .25rem}.lg2 .fb p{color:var(--c-muted);margin:0 0 1.2rem}
+.pw{position:relative}.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;font-size:1.1rem;min-width:40px;min-height:40px}
+.lg2 .fb label.ck{display:flex;flex-direction:row;gap:.5rem;align-items:center;font-size:.88rem;color:var(--c-text);margin:.8rem 0}.lg2 .fb input[type=checkbox]{width:auto;min-height:0}
+.lg2 details{margin-top:1rem;font-size:.85rem;color:var(--c-muted)}
+@media (max-width:1100px){.cols3{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.cols,.cols2,.cols3{grid-template-columns:1fr}.lg2{grid-template-columns:1fr}.lg2 .brandp{display:none}}
+/* Documentos imprimibles */
+#pv{position:fixed;inset:0;background:#94a3b8;overflow:auto;z-index:300;padding-bottom:2rem}
+.pvbar{position:sticky;top:0;display:flex;gap:.5rem;justify-content:center;padding:.7rem;background:#0f172a;z-index:2}
+.sheet{width:210mm;max-width:100%;min-height:297mm;background:#fff;margin:1rem auto;padding:12mm;box-shadow:0 6px 24px rgba(0,0,0,.3);color:#0f172a;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.bl-head{display:flex;align-items:center;gap:1rem;background:linear-gradient(90deg,#1e3a8a,#1d4ed8);color:#fff;padding:12px 16px;border-radius:10px}
+.bl-logo{width:54px;height:54px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:1.6rem;overflow:hidden}.bl-logo img{width:100%;height:100%;object-fit:contain}
+.bl-school{font-size:1.25rem;font-weight:800}.bl-sub{opacity:.85;font-size:.75rem}.bl-year{text-align:right;font-size:.75rem}.bl-year b{font-size:1rem}
+.bl-title{text-align:center;letter-spacing:.12em;font-size:1.3rem;margin:14px 0;color:#1e3a8a;border-bottom:3px solid #1d4ed8;padding-bottom:8px}
+.bl-data{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.bl-data div{border:1px solid #cbd5e1;border-radius:6px;padding:6px 8px}.bl-data small{display:block;color:#64748b;font-size:.68rem;text-transform:uppercase}
+.bl-t{width:100%;min-width:0;border-collapse:collapse;margin-bottom:10px}.bl-t th{background:#1e3a8a;color:#fff;padding:6px;font-size:.72rem;text-transform:uppercase;text-align:center}.bl-t td{border:1px solid #cbd5e1;padding:6px}.bl-t tbody tr:nth-child(even){background:#f1f5f9}
+.bl-t .c{text-align:center}.bl-t .low{color:#dc2626;font-weight:700}.bl-f td{background:#dbeafe!important;font-weight:700}
+.bl-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sheet h4{margin:10px 0 6px;color:#1e3a8a;text-transform:uppercase;font-size:.78rem;letter-spacing:.06em}
+.bl-obs{height:70px;border:1px solid #cbd5e1;border-radius:6px;background:repeating-linear-gradient(transparent 0 21px,#cbd5e1 21px 22px)}
+.bl-sign{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:46px;text-align:center}.bl-sign div{border-top:1.5px solid #0f172a;padding-top:6px;font-size:.78rem}
+.bl-foot{margin-top:18px;text-align:center;color:#64748b;font-size:.7rem;border-top:1px solid #e2e8f0;padding-top:8px}
+.fr-cover{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(120deg,#0b1a5c,#1e3a8a 55%,#2563eb);color:#fff;padding:26px 24px;border-radius:12px;margin-bottom:14px}
+.fr-cover h1{margin:4px 0;font-size:2rem;letter-spacing:.08em}.fr-kicker{opacity:.85;text-transform:uppercase;letter-spacing:.12em;font-size:.75rem}.fr-per{opacity:.9}.fr-mark{font-size:3rem}
+.fr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.fr-k{border:1px solid #cbd5e1;border-top:4px solid #1d4ed8;border-radius:8px;padding:8px 10px}.fr-k small{color:#64748b;display:block}.fr-k b{font-size:1rem}
+.fr-bars{display:flex;align-items:flex-end;gap:10px;height:150px;border-bottom:1px solid #cbd5e1;padding:0 4px}.fr-bars>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}.fr-bars span{display:flex;gap:2px;align-items:flex-end;height:125px;width:100%}.fr-bars em{flex:1;border-radius:3px 3px 0 0;min-height:2px}
+.fr-donut{width:130px;height:130px;border-radius:50%;margin:6px auto;position:relative}.fr-donut::after{content:'';position:absolute;inset:32px;background:#fff;border-radius:50%}.fr-leg{display:grid;gap:3px;font-size:.75rem}.fr-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+@media (max-width:700px){.sheet{padding:10px;font-size:11px}.bl-data,.fr-kpis{grid-template-columns:1fr 1fr}.bl-2{grid-template-columns:1fr}.bl-t{display:block;overflow-x:auto}}
+@page{size:A4;margin:8mm}
+@media print{body.printing>*:not(#pv){display:none!important}body.printing{background:#fff}#pv{position:static;background:#fff;padding:0;overflow:visible}.pvbar{display:none}.sheet{margin:0;box-shadow:none;width:auto;min-height:0;padding:0}}
+</style></head><body><div id="app"></div><script>
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// CAPA DE DATOS. Hoy guarda en el dispositivo (localStorage). Para conectar un servidor/base de datos
+// real, crea un adaptador con los mismos métodos (read, write, clear) y actívalo con db.use(miAdaptador).
+// Ninguna pantalla habla con localStorage directamente: todas usan `db`.
+const P = 'eduplat:';
+const local = {
+  read(k, d) { try { return JSON.parse(localStorage.getItem(P + k)) ?? d; } catch { return d; } },
+  write(k, v) { localStorage.setItem(P + k, JSON.stringify(v)); },
+  clear() { Object.keys(localStorage).filter(x => x.startsWith(P)).forEach(x => localStorage.removeItem(x)); }
+};
+let adapter = local;
+const db = {
+  user: 'Sistema',
+  use(a) { adapter = a; },
+  get(k, d = []) { return adapter.read(k, d); },
+  set(k, v) { adapter.write(k, v); },
+  add(k, item) { const l = this.get(k); item.id = crypto.randomUUID(); l.push(item); this.set(k, l); this.log('Crear', k); return item; },
+  remove(k, id) { this.set(k, this.get(k).filter(i => i.id !== id)); this.log('Eliminar', k); },
+  reset() { adapter.clear(); },
+  log(accion, modulo) { if (modulo === 'audit') return; const l = local.read('audit', []); l.push({ id: crypto.randomUUID(), fecha: new Date().toISOString(), usuario: this.user, accion, modulo }); local.write('audit', l.slice(-500)); }
+};
+
+// Recordatorios automáticos a familias. Hoy se generan dentro del sistema (campana + cola);
+// al conectar un servidor, un proceso programado leerá la cola 'notifs' y enviará por correo/WhatsApp.
+const NOTIF_DEFAULT = {
+  dias: 5, vencidos: true, canales: ['App'],
+  plantilla: 'Estimado/a {tutor}: la cuota "{concepto}" de {alumno} vence el {fecha} por {monto}.',
+  plantillaVencido: 'Estimado/a {tutor}: la cuota "{concepto}" de {alumno} venció el {fecha} y está pendiente por {monto}. Por favor regularice su pago.'
+};
+const notifCfg = () => ({ ...NOTIF_DEFAULT, ...db.get('notifcfg', {}) });
+const fill = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
+function scanPayments() {
+  const cfg = notifCfg(), st = db.get('students'), list = db.get('notifs'), have = new Set(list.map(n => n.clave)), today = new Date().toISOString().slice(0, 10); let made = 0;
+  db.get('pagos').filter(p => p.estado !== 'Pagado').forEach(p => {
+    const days = Math.round((new Date(p.fecha) - new Date(today)) / 86400000);
+    const kind = days < 0 ? (cfg.vencidos ? 'Pago vencido' : null) : days <= cfg.dias ? 'Pago próximo' : null;
+    if (!kind || have.has(p.id + '|' + kind)) return;
+    const s = st.find(x => x.id === p.sid); if (!s) return;
+    const v = { tutor: s.madre || s.padre || s.tutor || 'padre/madre/tutor', alumno: s.nombres + ' ' + s.apellidos, concepto: p.desc, fecha: p.fecha, monto: 'RD$ ' + Number(p.monto).toLocaleString('es-DO') };
+    list.push({ id: crypto.randomUUID(), clave: p.id + '|' + kind, sid: p.sid, tipo: kind, asunto: kind + ': ' + p.desc, mensaje: fill(kind === 'Pago vencido' ? cfg.plantillaVencido : cfg.plantilla, v), creada: today, canales: cfg.canales, estado: 'En cola' }); made++;
+  });
+  if (made) db.set('notifs', list);
+  return made;
+}
+
+// Roles, menús por rol y páginas. Para añadir un módulo: crea src/pages/x.js, regístralo en PAGES y en MENUS.
+const ROLES = {
+  admin:   { label: 'Dirección / Administración' },
+  teacher: { label: 'Docente' },
+  student: { label: 'Estudiante' },
+  parent:  { label: 'Padre / Tutor' }
+};
+const PAGES = {
+  dashboard: 'Inicio', students: 'Expedientes', enroll: 'Matrícula', teachers: 'Docentes y cargas', schedule: 'Horarios', academic: 'Estructura académica',
+  requests: 'Inscripciones', payments: 'Pagos', finance: 'Contabilidad', avisos: 'Avisos', reports: 'Reportes', settings: 'Configuración',
+  audit: 'Auditoría', classrooms: 'Aulas virtuales', notifs: 'Notificaciones', attendance: 'Asistencia', grades: 'Registro de calificaciones', classroom: 'Aula virtual', courses: 'Mis materias', mynotes: 'Calificaciones', myatt: 'Asistencia'
+};
+// Menú por rol. Un grupo tiene hijos `c: [[página, etiqueta, subpágina?]]` y se despliega al pulsarlo.
+const MENUS = {
+  admin: [
+    { k: 'dashboard', l: 'Dashboard', i: '▦' },
+    { l: 'Estudiantes', i: '👥', c: [['students', 'Expedientes'], ['enroll', 'Matrícula']] },
+    { l: 'Docentes', i: '👩‍🏫', c: [['teachers', 'Asignación'], ['schedule', 'Horarios']] },
+    { l: 'Académico', i: '🎓', c: [['academic', 'Niveles', 'niveles'], ['academic', 'Grados', 'grados'], ['academic', 'Secciones', 'secciones'], ['academic', 'Asignaturas', 'materias'], ['classrooms', 'Aulas virtuales']] },
+    { l: 'Inscripciones', i: '📝', c: [['requests', 'Aprobación', 'aprobacion'], ['requests', 'Solicitudes', 'solicitudes']] },
+    { l: 'Finanzas', i: '💳', c: [['payments', 'Pagos']] },
+    { l: 'Contabilidad', i: '💰', c: [['finance', 'Ingresos', 'ingresos'], ['finance', 'Egresos', 'egresos'], ['finance', 'Resumen financiero', 'todo']] },
+    { l: 'Comunicación', i: '📢', c: [['avisos', 'Avisos'], ['notifs', 'Notificaciones automáticas']] },
+    { k: 'reports', l: 'Reportes', i: '📈' },
+    { k: 'settings', l: 'Configuración', i: '⚙️' },
+    { k: 'audit', l: 'Auditoría', i: '🛡️' }
+  ],
+  teacher: [
+    { k: 'dashboard', l: 'Panel docente', i: '▦' },
+    { l: 'Mi enseñanza', i: '📚', c: [['classroom', 'Mis aulas y tareas'], ['attendance', 'Control de asistencia'], ['grades', 'Registro de calificaciones']] },
+    { k: 'schedule', l: 'Mi horario', i: '🗓️' },
+    { k: 'students', l: 'Mis estudiantes', i: '🎓' },
+    { k: 'avisos', l: 'Avisos', i: '📢' }
+  ],
+  student: [
+    { k: 'dashboard', l: 'Inicio', i: '▦' },
+    { k: 'courses', l: 'Mis materias', i: '📖' },
+    { k: 'classroom', l: 'Mis actividades', i: '📝' },
+    { k: 'schedule', l: 'Calendario y horario', i: '🗓️' },
+    { l: 'Mi progreso', i: '📈', c: [['mynotes', 'Calificaciones'], ['myatt', 'Asistencia']] },
+    { k: 'avisos', l: 'Avisos', i: '📢' }
+  ],
+  parent: [
+    { k: 'dashboard', l: 'Panel familiar', i: '▦' },
+    { k: 'mynotes', l: 'Calificaciones', i: '📊' },
+    { k: 'myatt', l: 'Asistencia', i: '✅' },
+    { k: 'schedule', l: 'Horario', i: '🗓️' },
+    { k: 'payments', l: 'Pagos', i: '💳' },
+    { k: 'avisos', l: 'Avisos', i: '📢' }
+  ]
+};
+// Accesos de DEMOSTRACIÓN configurados (no son seguridad real; al conectar un servidor se reemplazan)
+const DEMO_USERS = [
+  { u: 'admin', p: 'admin1234', role: 'admin', name: 'Director General' },
+  { u: 'docente', p: 'docente1234', role: 'teacher', name: 'Docente' },
+  { u: 'estudiante', p: 'estudiante1234', role: 'student', name: 'Estudiante' },
+  { u: 'padre', p: 'padre1234', role: 'parent', name: 'Madre / Tutor' }
+];
+const EVAL_DEFAULT = [['Examen', 20], ['Práctica', 20], ['Trabajo', 20], ['Parcial', 20], ['Examen 2', 20]];
+const CURRENCY = 'RD$';
+
+const badge = (t, c = 'info') => `<span class="bd ${c}">${esc(t)}</span>`;
+const money = n => 'RD$ ' + Number(n || 0).toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const stateColor = { Pagado: 'ok', Pendiente: 'warn', Vencido: 'bad', Parcial: 'info', Activo: 'ok', Inactivo: 'gray' };
+const initials = (a = '', b = '') => ((a[0] || '') + (b[0] || '')).toUpperCase() || '?';
+function gradeList() { return [...new Set([...db.get('grados').map(g => g.nombre), ...db.get('students').map(s => s.grado)].filter(Boolean))]; }
+function field(f, v = '') {
+  const [n, l, t = ''] = f;
+  const inp = t.startsWith('select:') ? `<select name="${n}">${t.slice(7).split(',').map(o => `<option ${o === v ? 'selected' : ''}>${o}</option>`).join('')}</select>`
+    : `<input name="${n}" ${t === 'req' ? 'required' : t ? `type="${t}"` : ''} value="${esc(v)}">`;
+  return `<label>${l}${inp}</label>`;
+}
+const readForm = m => Object.fromEntries([...m.querySelectorAll('[name]')].map(i => [i.name, i.value]));
+function modal(title, body, onSave, wide) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="mbox ${wide ? 'wide' : ''}"><div class="mh"><b>${title}</b><button class="x">✕</button></div><div class="mb">${body}</div>${onSave ? '<div class="mf"><button class="btn ghost c">Cancelar</button><button class="btn s">Guardar</button></div>' : ''}</div>`;
+  document.body.appendChild(m);
+  const close = () => m.remove();
+  m.querySelector('.x').onclick = close;
+  if (onSave) {
+    m.querySelector('.c').onclick = close;
+    m.querySelector('.s').onclick = () => { if ([...m.querySelectorAll('[required]')].some(i => !i.value.trim())) return alert('Completa los campos obligatorios.'); if (onSave(m) !== false) close(); };
+  }
+  return m;
+}
+// Tabla con buscador y paginación
+function table(host, { cols, rows, size = 8, tools = '' }) {
+  let q = '', p = 1;
+  host.innerHTML = `<div class="tools"><input class="q" placeholder="🔍 Buscar...">${tools}</div><div class="tablewrap"><table><thead><tr>${cols.map(c => `<th>${c.h}</th>`).join('')}</tr></thead><tbody></tbody></table></div><div class="pager"></div>`;
+  const paint = () => {
+    const all = rows.filter(r => !q || JSON.stringify(Object.values(r)).toLowerCase().includes(q));
+    const pages = Math.max(1, Math.ceil(all.length / size)); p = Math.min(p, pages);
+    const sl = all.slice((p - 1) * size, p * size);
+    host.querySelector('tbody').innerHTML = sl.map((r, i) => `<tr>${cols.map(c => `<td>${c.f(r, (p - 1) * size + i + 1)}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" class="empty">Sin registros todavía</td></tr>`;
+    host.querySelector('.pager').innerHTML = `<span>Registros ${all.length ? (p - 1) * size + 1 : 0} al ${Math.min(p * size, all.length)} de ${all.length}</span><span><button class="btn ghost sm" data-p="-1" ${p <= 1 ? 'disabled' : ''}>Anterior</button> <b>${p}/${pages}</b> <button class="btn ghost sm" data-p="1" ${p >= pages ? 'disabled' : ''}>Siguiente</button></span>`;
+  };
+  host.querySelector('.q').oninput = e => { q = e.target.value.toLowerCase(); p = 1; paint(); };
+  host.addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (b) { p += Number(b.dataset.p); paint(); } });
+  paint();
+}
+function exportCSV(name, head, rows) {
+  const csv = [head, ...rows].map(r => r.map(c => '"' + String(c ?? '').replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = name + '.csv'; a.click();
+}
+const cfgFor = (g, m) => db.get('evalmap', {})[g + '|' + m] || db.get('evalcfg', EVAL_DEFAULT);
+const isVisible = (g, m, p) => !!db.get('evalvis', {})[g + '|' + m + '|' + p];
+const totalOf = (v, cfg) => v.reduce((a, x, i) => a + (Number(x) || 0) * (cfg[i] ? Number(cfg[i][1]) : 0) / 100, 0);
+// onlyVisible: estudiantes y familias solo ven lo que el docente decidió mostrar
+function studentStats(sid, onlyVisible) {
+  const notes = db.get('notes', {}), tots = [];
+  Object.entries(notes).forEach(([key, g]) => { const [gr, ma, pe] = key.split('|'), v = g[sid]; if (v && v.some(x => x !== '') && (!onlyVisible || isVisible(gr, ma, pe))) tots.push(totalOf(v, cfgFor(gr, ma))); });
+  let pr = 0, tot = 0; db.get('attendance').forEach(r => { const m = r.marks[sid]; if (m) { tot++; if (m === 'P' || m === 'T') pr++; } });
+  return { avg: tots.length ? tots.reduce((a, b) => a + b, 0) / tots.length : null, att: tot ? Math.round(pr * 100 / tot) : null };
+}
+
+const spark = (c = '#1d4ed8') => `<svg viewBox="0 0 100 26" preserveAspectRatio="none" class="spark"><path d="M0 20 Q12 16 25 12 T50 8 T75 14 T100 6" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round"/><path d="M0 20 Q12 16 25 12 T50 8 T75 14 T100 6 V26 H0 Z" fill="${c}" opacity=".12"/></svg>`;
+const ring = (pct, c = '#1d4ed8') => `<span class="ring" style="--p:${pct};--c:${c}"><b>${pct}%</b></span>`;
+function donut(parts, center) {
+  const sum = parts.reduce((a, p) => a + p[0], 0); let acc = 0;
+  const st = sum ? parts.map(p => { const a = acc * 100 / sum; acc += p[0]; return `${p[1]} ${a}% ${acc * 100 / sum}%`; }).join(',') : '#e2e8f0 0 100%';
+  return `<div class="donut" style="background:conic-gradient(${st})"><span>${center}</span></div>`;
+}
+const ICONS = ['💻', '🔧', '📐', '🔬', '📖', '🎨', '🧮', '🌎'];
+const hsh = t => [...String(t)].reduce((a, c) => a + c.charCodeAt(0) * 7, 0);
+const courseColor = t => `linear-gradient(135deg,hsl(${200 + hsh(t) % 60},70%,38%),hsl(${215 + hsh(t) % 50},75%,55%))`;
+const courseIcon = t => ICONS[hsh(t) % ICONS.length];
+function myCourses(grado) {
+  const a = db.get('aulas').filter(x => x.grado === grado);
+  return a.length ? a.map(x => ({ materia: x.materia, docente: x.docente })) : db.get('materias').map(m => ({ materia: m.nombre, docente: m.docente || '' }));
+}
+function courseProgress(sid, grado, materia) {
+  const cfg = cfgFor(grado, materia), notes = db.get('notes', {}); let f = 0;
+  for (let p = 1; p <= 4; p++) { const d = (notes[`${grado}|${materia}|${p}`] || {})[sid]; if (d) f += d.filter(x => x !== '').length; }
+  return Math.min(100, Math.round(f * 100 / (cfg.length * 4)));
+}
+
+// Documentos imprimibles (boletín y reporte financiero). Vista previa + Imprimir / Guardar como PDF.
+function showPrint(html) {
+  const o = document.createElement('div'); o.id = 'pv';
+  o.innerHTML = `<div class="pvbar"><button class="btn" id="pvp">🖨️ Imprimir / Guardar PDF</button><button class="btn ghost" id="pvx">Cerrar</button></div>${html}`;
+  document.body.appendChild(o); document.body.classList.add('printing');
+  o.querySelector('#pvx').onclick = () => { o.remove(); document.body.classList.remove('printing'); };
+  o.querySelector('#pvp').onclick = () => print();
+}
+const head = inst => `<div class="bl-head"><div class="bl-logo">${inst.logo ? `<img src="${inst.logo}" alt="">` : '🎓'}</div><div class="grow"><div class="bl-school">${esc(inst.name || 'Gestión Escolar')}</div><div class="bl-sub">${esc(inst.address || '')}${inst.phone ? ' · ' + esc(inst.phone) : ''}${inst.email ? ' · ' + esc(inst.email) : ''}</div></div><div class="bl-year">Año escolar<br><b>${esc(inst.year || '2026-2027')}</b></div></div>`;
+function boletinHTML(me, all) {
+  const inst = db.get('inst', {}), notes = db.get('notes', {}), g = me.grado;
+  const rows = myCourses(g).map(c => { const cfg = cfgFor(g, c.materia); const t = ['1', '2', '3', '4'].map(p => { const d = (notes[`${g}|${c.materia}|${p}`] || {})[me.id]; return d && d.some(x => x !== '') && (all || isVisible(g, c.materia, p)) ? totalOf(d, cfg) : null; }); const v = t.filter(x => x !== null); return { m: c.materia, t, avg: v.length ? v.reduce((a, b) => a + b, 0) / v.length : null }; });
+  const av = rows.map(r => r.avg).filter(x => x !== null), gen = av.length ? av.reduce((a, b) => a + b, 0) / av.length : null;
+  const c = { P: 0, A: 0, T: 0, J: 0 }; db.get('attendance').forEach(r => { const k = r.marks[me.id]; if (k) c[k]++; });
+  const tot = c.P + c.A + c.T + c.J, pct = tot ? Math.round((c.P + c.T) * 100 / tot) : null;
+  const cell = n => n === null ? '<td class="c">—</td>' : `<td class="c ${n >= 70 ? '' : 'low'}">${n.toFixed(0)}</td>`;
+  return `<div class="sheet bl">${head(inst)}<h1 class="bl-title">BOLETÍN DE CALIFICACIONES</h1>
+  <div class="bl-data"><div><small>Estudiante</small><b>${esc(me.apellidos)}, ${esc(me.nombres)}</b></div><div><small>Grado / sección</small><b>${esc(g)}</b></div><div><small>Código</small><b>${esc(me.codigo || '—')}</b></div><div><small>Fecha de emisión</small><b>${new Date().toISOString().slice(0, 10)}</b></div></div>
+  <table class="bl-t"><thead><tr><th style="text-align:left">Asignatura</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>Promedio</th><th>Estado</th></tr></thead><tbody>
+  ${rows.map(r => `<tr><td>${esc(r.m)}</td>${r.t.map(cell).join('')}<td class="c"><b>${r.avg === null ? '—' : r.avg.toFixed(1)}</b></td><td class="c">${r.avg === null ? '—' : r.avg >= 70 ? 'Aprobada' : 'Reprobada'}</td></tr>`).join('') || '<tr><td colspan="7" class="c">Sin asignaturas registradas</td></tr>'}
+  <tr class="bl-f"><td>Promedio general</td><td colspan="4"></td><td class="c"><b>${gen === null ? '—' : gen.toFixed(1)}</b></td><td></td></tr></tbody></table>
+  <div class="bl-2"><div><h4>Resumen de asistencia</h4><table class="bl-t"><tbody><tr><td>Días presente</td><td class="c">${c.P}</td></tr><tr><td>Tardanzas</td><td class="c">${c.T}</td></tr><tr><td>Ausencias justificadas</td><td class="c">${c.J}</td></tr><tr><td>Ausencias sin justificar</td><td class="c">${c.A}</td></tr><tr class="bl-f"><td>% de asistencia</td><td class="c"><b>${pct === null ? '—' : pct + '%'}</b></td></tr></tbody></table></div>
+  <div><h4>Escala de valoración</h4><table class="bl-t"><tbody><tr><td>90 – 100</td><td>Excelente</td></tr><tr><td>80 – 89</td><td>Muy bueno</td></tr><tr><td>70 – 79</td><td>Satisfactorio</td></tr><tr><td>Menos de 70</td><td>Necesita apoyo</td></tr></tbody></table></div></div>
+  <h4>Observaciones</h4><div class="bl-obs"></div><div class="bl-sign"><div>Director/a</div><div>Docente titular</div><div>Padre, madre o tutor</div></div>
+  <div class="bl-foot">Documento generado por el Sistema de Gestión Escolar · ${esc(inst.name || 'Gestión Escolar')}</div></div>`;
+}
+function financeHTML(all, from, to) {
+  const inst = db.get('inst', {}), sum = t => all.filter(m => m.tipo === t).reduce((a, m) => a + Number(m.monto), 0), ing = sum('Ingreso'), egr = sum('Egreso');
+  const pc = db.get('pagos').filter(p => p.estado !== 'Pagado').reduce((a, p) => a + Number(p.monto), 0);
+  const by = {}; all.forEach(m => { const k = m.fecha.slice(0, 7); by[k] = by[k] || [0, 0]; by[k][m.tipo === 'Ingreso' ? 0 : 1] += Number(m.monto); });
+  const ks = Object.keys(by).sort(), mx = Math.max(1, ...ks.flatMap(k => by[k]));
+  const cat = {}; all.filter(m => m.tipo === 'Ingreso').forEach(m => cat[m.categoria] = (cat[m.categoria] || 0) + Number(m.monto));
+  const cs = Object.entries(cat).sort((a, b) => b[1] - a[1]), COL = ['#1d4ed8', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe']; let acc = 0;
+  const stops = cs.map(([k, v], i) => { const a = acc * 100 / (ing || 1); acc += v; return `${COL[i % 5]} ${a}% ${acc * 100 / (ing || 1)}%`; }).join(',') || '#e2e8f0 0 100%';
+  const kp = (t, v, c) => `<div class="fr-k" style="border-top-color:${c}"><small>${t}</small><b>${v}</b></div>`;
+  return `<div class="sheet fr"><div class="fr-cover"><div><div class="fr-kicker">${esc(inst.name || 'Gestión Escolar')}</div><h1>REPORTE FINANCIERO</h1><div class="fr-per">${from || to ? esc(from || 'Inicio') + ' al ' + esc(to || 'hoy') : 'Todos los movimientos'} · Año escolar ${esc(inst.year || '2026-2027')}</div></div><div class="fr-mark">📊</div></div>
+  <div class="fr-kpis">${kp('Ingresos', money(ing), '#1d4ed8')}${kp('Egresos', money(egr), '#60a5fa')}${kp('Balance', money(ing - egr), ing - egr >= 0 ? '#16a34a' : '#dc2626')}${kp('Por cobrar', money(pc), '#f59e0b')}</div>
+  <div class="bl-2"><div><h4>Ingresos y egresos por mes</h4><div class="fr-bars">${ks.map(k => `<div><span><em style="height:${by[k][0] * 100 / mx}%;background:#1d4ed8"></em><em style="height:${by[k][1] * 100 / mx}%;background:#93c5fd"></em></span><small>${k.slice(5)}/${k.slice(2, 4)}</small></div>`).join('') || '<small>Sin datos</small>'}</div><small>■ Ingresos &nbsp; <span style="color:#93c5fd">■</span> Egresos</small></div>
+  <div><h4>Ingresos por categoría</h4><div class="fr-donut" style="background:conic-gradient(${stops})"></div><div class="fr-leg">${cs.map(([k, v], i) => `<span><i style="background:${COL[i % 5]}"></i>${esc(k)} · ${money(v)}</span>`).join('') || '<small>Sin ingresos</small>'}</div></div></div>
+  <h4>Detalle de movimientos</h4><table class="bl-t"><thead><tr><th style="text-align:left">Fecha</th><th style="text-align:left">Categoría</th><th style="text-align:left">Subcategoría</th><th>Tipo</th><th style="text-align:right">Monto</th></tr></thead><tbody>${all.map(m => `<tr><td>${esc(m.fecha)}</td><td>${esc(m.categoria)}</td><td>${esc(m.sub)}</td><td class="c">${esc(m.tipo)}</td><td style="text-align:right">${money(m.monto)}</td></tr>`).join('') || '<tr><td colspan="5" class="c">Sin movimientos</td></tr>'}</tbody></table>
+  <div class="bl-foot">Reporte generado el ${new Date().toISOString().slice(0, 10)} · Sistema de Gestión Escolar</div></div>`;
+}
+
+// Lista reutilizable: formulario + tabla + eliminar. fields = [[campo, etiqueta, atributos]]
+function crud(root, { key, title, fields }) {
+  const draw = () => {
+    const list = db.get(key);
+    root.innerHTML = `<div class="card"><h3>${title}</h3><form class="form">${fields.map(f => `<label>${f[1]}<input name="${f[0]}" ${f[2] || ''}></label>`).join('')}</form>
+      <div class="actions"><button class="btn" data-s>Guardar</button></div>
+      <div class="tablewrap"><table><thead><tr>${fields.map(f => `<th>${f[1]}</th>`).join('')}<th></th></tr></thead><tbody>
+      ${list.map(r => `<tr>${fields.map(f => `<td>${esc(r[f[0]])}</td>`).join('')}<td><button class="btn bad sm" data-d="${r.id}">Eliminar</button></td></tr>`).join('')}</tbody></table></div>
+      ${list.length ? '' : '<div class="empty">Sin registros todavía.</div>'}</div>`;
+    root.querySelector('[data-s]').onclick = () => { const f = root.querySelector('form'); if (!f.reportValidity()) return; db.add(key, Object.fromEntries(new FormData(f))); draw(); };
+    root.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { if (confirm('¿Eliminar?')) { db.remove(key, b.dataset.d); draw(); } });
+  };
+  draw();
+}
+
+// Datos de demostración. Se cargan con un botón y se borran con "Restablecer demo".
+const uid = () => crypto.randomUUID();
+function seedDemo() {
+  const S = [['González Pérez', 'Juan', '1ro A', 'Masculino'], ['Hernández Ramírez', 'María', '1ro A', 'Femenino'], ['López García', 'Carlos', '1ro A', 'Masculino'],
+    ['Martínez Ferrer', 'Laura', '2do B', 'Femenino'], ['Toro Jiménez', 'Andrés', '2do B', 'Masculino'], ['Pulido Martínez', 'Isabel', '2do B', 'Femenino']]
+    .map((x, i) => ({ id: uid(), apellidos: x[0], nombres: x[1], grado: x[2], sexo: x[3], ...(i === 0 ? { usuario: 'estudiante' } : {}), ...(i < 2 ? { familia: 'padre' } : {}), cedula: '001-' + (1000000 + i * 137) + '-' + i, codigo: 'A' + (100 + i), telefono: '809-555-01' + i + i, estado: 'Activo', padre: 'Pedro ' + x[0].split(' ')[0], madre: 'Ana ' + x[0].split(' ')[0] }));
+  db.set('students', S);
+  const T = [['Ochoa Dalton', 'Dante', 'Primaria', 'Titular'], ['González Mejía', 'Ana Melva', 'Primaria', 'Titular'], ['Idrogo Mariño', 'César', 'Primaria', 'Especialista']]
+    .map((x, i) => ({ id: uid(), apellidos: x[0], nombres: x[1], nivel: x[2], tipo: x[3], ...(i === 0 ? { usuario: 'docente' } : {}), cedula: '002-' + (2000000 + i * 211) + '-' + i, telefono: '829-555-02' + i + i }));
+  db.set('teachers', T);
+  const tn = i => T[i].nombres + ' ' + T[i].apellidos;
+  db.set('grados', [{ id: uid(), nombre: '1ro A', nivel: 'Primaria' }, { id: uid(), nombre: '2do B', nivel: 'Primaria' }]);
+  db.set('secciones', [{ id: uid(), grado: '1ro A', seccion: 'A', aula: 'Aula 101', turno: 'Matutino' }, { id: uid(), grado: '2do B', seccion: 'B', aula: 'Aula 102', turno: 'Matutino' }]);
+  const M = [['Matemática', 0], ['Lengua Española', 1], ['Ciencias Naturales', 2], ['Ciencias Sociales', 1], ['Educación Artística', 2]];
+  db.set('materias', M.map(m => ({ id: uid(), nombre: m[0], docente: tn(m[1]) })));
+  db.set('asignaciones', [[0, '1ro A', 'Matemática'], [0, '2do B', 'Matemática'], [1, '1ro A', 'Lengua Española'], [1, '2do B', 'Ciencias Sociales'], [2, '1ro A', 'Ciencias Naturales']].map(a => ({ id: uid(), tid: T[a[0]].id, grado: a[1], materia: a[2] })));
+  const H = ['08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00'], hor = [];
+  ['1ro A', '2do B'].forEach((g, gi) => [1, 2, 3, 4, 5].forEach(d => H.forEach((h, hi) => { const m = M[(d + hi + gi) % 5]; hor.push({ id: uid(), dia: d, hora: h, materia: m[0], docente: tn(m[1]), aula: 'Aula 10' + (gi + 1), grado: g }); })));
+  db.set('horario', hor);
+  const pg = [];
+  S.forEach((s, i) => { pg.push({ id: uid(), sid: s.id, desc: 'Matrícula 2026-2027', fecha: '2026-08-15', estado: 'Pagado', monto: 3000 });
+    [['Septiembre', '2026-09-05', 'Pagado'], ['Octubre', '2026-10-05', i % 3 === 2 ? 'Vencido' : 'Pagado'], ['Noviembre', '2026-11-05', 'Pendiente'], ['Diciembre', '2026-12-05', 'Pendiente']]
+      .forEach(m => pg.push({ id: uid(), sid: s.id, desc: 'Mensualidad ' + m[0], fecha: m[1], estado: m[2], monto: 2500 })); });
+  db.set('pagos', pg);
+  db.set('movs', [['Ingreso', 'Matrícula', 'Inscripciones', 18000, '2026-08-15'], ['Ingreso', 'Mensualidades', 'Septiembre', 15000, '2026-09-06'], ['Ingreso', 'Mensualidades', 'Octubre', 10000, '2026-10-06'], 
+    ['Egreso', 'Nómina', 'Docentes', 24000, '2026-09-30'], ['Egreso', 'Servicios', 'Energía e internet', 6200, '2026-10-10'], ['Egreso', 'Mantenimiento', 'Pintura de aulas', 3500, '2026-10-18'], ['Egreso', 'Papelería', 'Material de oficina', 850, '2026-10-20']]
+    .map(x => ({ id: uid(), tipo: x[0], categoria: x[1], sub: x[2], monto: x[3], fecha: x[4] })));
+  const nv = { '1ro A': [[85, 90, 78, 88, 80], [92, 95, 88, 90, 94], [70, 65, 80, 72, 75]] }; const n1 = {}; S.slice(0, 3).forEach((s, i) => n1[s.id] = nv['1ro A'][i]);
+  db.set('notes', { '1ro A|Matemática|1': n1, '1ro A|Lengua Española|1': Object.fromEntries(S.slice(0, 3).map((s, i) => [s.id, [88 - i * 5, 80, 90 - i * 3, 85, 82]])) });
+  db.set('evalvis', { '1ro A|Matemática|1': true, '1ro A|Lengua Española|1': true });
+  db.set('attendance', ['2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05'].map((d, k) => ({ date: d, grado: '1ro A', marks: Object.fromEntries(S.slice(0, 3).map((s, i) => [s.id, (k + i) % 4 === 3 ? 'A' : 'P'])) })));
+  db.set('posts', [{ id: uid(), tipo: 'tarea', titulo: 'Ejercicios de fracciones', fecha: '2026-11-12', texto: 'Resolver la página 45 del libro.', aula: '1ro A|Matemática', autor: tn(0) }, { id: uid(), tipo: 'anuncio', titulo: 'Reunión de padres', texto: 'Viernes 13 a las 4:00 p. m. en el salón de actos.', autor: 'Dirección' }]);
+  db.set('points', [{ id: uid(), studentId: S[0].id, delta: 3, reason: '👏 Participación', date: '2026-11-03' }, { id: uid(), studentId: S[1].id, delta: 5, reason: '📚 Tarea completa', date: '2026-11-04' }]);
+  db.set('niveles', [{ id: uid(), nombre: 'Primaria', descripcion: '1ro a 6to' }, { id: uid(), nombre: 'Secundaria', descripcion: '1ro a 6to' }]);
+  db.set('aulas', ['1ro A', '2do B'].flatMap(g => M.map(m => ({ id: uid(), grado: g, materia: m[0], docente: tn(m[1]) }))));
+  db.set('requests', [['Sofía', 'Reyes Peña', '1ro A', '2026-10-28', 'Pendiente'], ['Luis', 'Castillo Mena', '2do B', '2026-10-30', 'Pendiente'], ['Ana', 'Brito Gómez', '1ro A', '2026-11-02', 'Pendiente']].map(r => ({ id: uid(), nombres: r[0], apellidos: r[1], grado: r[2], fecha: r[3], estado: r[4] })));
+  db.set('inst', { name: 'Colegio Nuevo Horizonte', director: 'Lic. Rosa Martínez', pais: 'República Dominicana', municipio: 'Santo Domingo Este', year: '2026-2027', phone: '809-555-0100', email: 'info@colegio.edu.do', address: 'Av. Principal #123' });
+}
+
+const WK = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+const todayN = () => { const d = new Date().getDay(); return d >= 1 && d <= 5 ? d : 1; };
+const kpi = (t, v, extra = '', cls = '') => `<div class="kpi ${cls}"><small>${t}</small><b>${v}</b>${extra}</div>`;
+const classesOf = list => { const d = todayN(), l = list.filter(h => h.dia === d).sort((a, b) => a.hora.localeCompare(b.hora)); return `<div class="card"><h3>Clases de ${WK[d]}</h3>${l.map(h => `<div class="rank"><b>${esc(h.hora)}</b> ${esc(h.materia)}<span class="pts" style="font-weight:400;font-size:.85rem">${esc(h.aula)}</span></div>`).join('') || '<div class="empty">Sin clases programadas.</div>'}</div>`; };
+const posts = tipo => db.get('posts').filter(p => p.tipo === tipo).slice().reverse();
+const tareas = () => posts('tarea').filter(p => p.fecha).sort((a, b) => a.fecha.localeCompare(b.fecha));
+const avisosCard = () => `<div class="card"><h3>📢 Avisos y novedades</h3>${posts('anuncio').slice(0, 3).map(a => `<div class="post"><b>${esc(a.titulo)}</b><p style="margin:.2rem 0">${esc(a.texto)}</p></div>`).join('') || '<div class="empty">Sin avisos.</div>'}</div>`;
+const entregasCard = () => `<div class="card"><h3>📅 Próximas entregas</h3>${tareas().slice(0, 4).map(t => `<div class="rank" data-t="${t.id}" style="cursor:pointer" title="Ver detalle"><span>📝</span><div><b>${esc(t.titulo)}</b><br><small>${esc(t.texto)}</small></div><span class="pts">${badge(t.fecha, 'warn')}</span></div>`).join('') || '<div class="empty">Nada pendiente.</div>'}<div class="actions"><a class="btn sm" href="#classroom">Ver actividades</a></div></div>`;
+function monthly(mv) {
+  const by = {}; mv.forEach(m => { const k = m.fecha.slice(0, 7); by[k] = by[k] || [0, 0]; by[k][m.tipo === 'Ingreso' ? 0 : 1] += Number(m.monto); });
+  const ks = Object.keys(by).sort().slice(-6), mx = Math.max(1, ...ks.flatMap(k => by[k]));
+  return `<div class="bars">${ks.map(k => `<div><span><em style="height:${by[k][0] * 100 / mx}%;background:#1d4ed8" title="Ingresos"></em><em style="height:${by[k][1] * 100 / mx}%;background:#93c5fd" title="Egresos"></em></span><small>${k.slice(5)}/${k.slice(2, 4)}</small></div>`).join('') || '<div class="empty" style="width:100%">Sin movimientos aún.</div>'}</div><small style="color:var(--c-muted)">■ Ingresos &nbsp; <span style="color:#93c5fd">■</span> Egresos</small>`;
+}
+function admin(root, s, again) {
+  const st = db.get('students'), T = db.get('teachers'), rq = db.get('requests'), mv = db.get('movs'), pend = rq.filter(r => r.estado === 'Pendiente').length;
+  const paid = db.get('pagos').filter(p => p.estado === 'Pagado').reduce((a, p) => a + Number(p.monto), 0);
+  let pr = 0, tot = 0; db.get('attendance').forEach(r => Object.values(r.marks).forEach(m => { tot++; if (m === 'P' || m === 'T') pr++; }));
+  const ing = mv.filter(m => m.tipo === 'Ingreso').reduce((a, m) => a + Number(m.monto), 0), egr = mv.filter(m => m.tipo === 'Egreso').reduce((a, m) => a + Number(m.monto), 0);
+  const aulas = db.get('aulas');
+  root.innerHTML = `<h2 class="pt">Resumen principal de administración</h2>
+  ${st.length ? '' : '<div class="card"><h3>👋 Bienvenido</h3><p>El sistema está vacío y listo para usarse. Registra tus datos o carga datos de demostración para explorarlo.</p><button class="btn" id="seed">Cargar datos de demostración</button></div>'}
+  <div class="kpis">${kpi('Estudiantes matriculados', st.length, spark() + '<small>Estado: <b style="color:var(--c-ok);font-size:inherit;display:inline">● Al día</b></small>')}${kpi('Docentes activos', T.length)}${kpi('Secciones habilitadas', db.get('secciones').length)}
+  ${kpi('Solicitudes de inscripción pendientes', pend, pend ? '<span class="bd warn">⚠ Requiere atención</span>' : '', pend ? 'al' : '')}${kpi('Pagos realizados', money(paid))}${kpi('Asistencia general', tot ? Math.round(pr * 100 / tot) + '%' : '—')}</div>
+  <div class="cols"><div>
+   <div class="card"><h3>Gestión de aulas virtuales</h3><div class="form"><label>Curso / grado<select id="ag">${gradeList().map(g => `<option>${esc(g)}</option>`).join('')}</select></label><label>Asignatura<select id="am">${db.get('materias').map(m => `<option>${esc(m.nombre)}</option>`).join('')}</select></label><label>Docente<select id="ad">${T.map(t => `<option>${esc(t.nombres)} ${esc(t.apellidos)}</option>`).join('')}</select></label></div>
+   <div class="actions"><button class="btn" id="addAula">+ Añadir nueva aula virtual</button><a class="btn ghost" href="#classrooms">Supervisar aulas</a></div>
+   ${aulas.map(a => `<div class="rank">${courseIcon(a.materia)} <b>${esc(a.materia)}</b> · ${esc(a.grado)}<small style="color:var(--c-muted)">${esc(a.docente)} · ${st.filter(x => x.grado === a.grado).length} alumnos vinculados automáticamente</small><button class="btn bad sm pts" data-xa="${a.id}">Quitar</button></div>`).join('') || '<div class="empty">Aún no hay aulas virtuales.</div>'}</div>
+   <div class="card"><h3>Inscripciones recientes</h3><div class="tablewrap"><table><thead><tr><th>Nombre</th><th>Fecha</th><th>Grado</th><th>Estado</th></tr></thead><tbody>${rq.slice(-5).reverse().map(r => `<tr><td>${esc(r.nombres)} ${esc(r.apellidos)}</td><td>${esc(r.fecha)}</td><td>${esc(r.grado)}</td><td>${badge(r.estado, r.estado === 'Aprobado' ? 'ok' : r.estado === 'Rechazado' ? 'bad' : 'warn')}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">Sin solicitudes</td></tr>'}</tbody></table></div><div class="actions"><a class="btn sm" href="#requests/aprobacion">Gestionar inscripciones</a></div></div></div>
+   <div><div class="card"><h3>Balances mensuales RD$</h3><p style="margin:0"><b>${money(ing - egr)}</b> <small style="color:var(--c-muted)">balance acumulado</small></p>${monthly(mv)}</div></div></div>`;
+  root.querySelector('#seed')?.addEventListener('click', () => { seedDemo(); location.reload(); });
+  root.querySelector('#addAula')?.addEventListener('click', () => { const g = root.querySelector('#ag').value, m = root.querySelector('#am').value; if (!g || !m) return alert('Primero crea grados y asignaturas (Académico).'); db.add('aulas', { grado: g, materia: m, docente: root.querySelector('#ad').value }); again(); });
+  root.querySelectorAll('[data-xa]').forEach(b => b.onclick = () => { db.remove('aulas', b.dataset.xa); again(); });
+}
+function teacher(root, s) {
+  const st = db.get('students'), as = db.get('asignaciones').filter(a => a.tid === s.tid), gr = [...new Set(as.map(a => a.grado))], hoy = new Date().toISOString().slice(0, 10);
+  const sin = gr.filter(g => !db.get('attendance').some(r => r.grado === g && r.date === hoy));
+  root.innerHTML = `<div class="welcome"><div class="avatar lg">${initials(s.name.split(' ')[0], s.name.split(' ')[1])}</div><div><h2>Bienvenido/a, ${esc(s.name)}</h2><small style="color:var(--c-muted)">Panel docente</small></div></div>
+  <div class="kpis">${kpi('Mis cursos', as.length)}${kpi('Alumnos a cargo', st.filter(x => gr.includes(x.grado)).length)}${kpi('Tareas publicadas', posts('tarea').length)}${kpi('Asistencia pendiente hoy', sin.length, sin.length ? '<span class="bd warn">⚠ ' + sin.map(esc).join(', ') + '</span>' : '<span class="bd ok">Al día</span>', sin.length ? 'al' : 'good')}</div>
+  <div class="cols"><div>${classesOf(db.get('horario').filter(h => h.docente === s.name))}
+  <div class="card"><h3>Mis cursos</h3>${as.map(a => `<div class="rank">${courseIcon(a.materia)} <b>${esc(a.materia)}</b><span class="pts">${esc(a.grado)}</span></div>`).join('') || '<div class="empty">Aún no tienes cursos asignados. Dirección los asigna en Docentes → Asignación.</div>'}<div class="actions"><a class="btn" href="#attendance">✅ Tomar asistencia</a><a class="btn" href="#grades">📝 Registrar calificaciones</a><a class="btn ghost" href="#classroom">Publicar tarea</a></div></div></div>
+  <div>${entregasCard()}${avisosCard()}</div></div>`;
+}
+function student(root, s) {
+  const me = db.get('students').find(x => x.id === s.sid);
+  if (!me) { root.innerHTML = '<div class="card empty">Aún no hay estudiante vinculado. Dirección debe registrarlo en Estudiantes → Expedientes.</div>'; return; }
+  const k = studentStats(me.id, true), cs = myCourses(me.grado);
+  root.innerHTML = `<div class="welcome"><div class="avatar lg">${initials(me.nombres, me.apellidos)}</div><div><h2>¡Bienvenido/a, ${esc(me.nombres)}!</h2><small style="color:var(--c-muted)">● En línea · ${esc(me.grado)}</small></div></div>
+  <div class="kpis">${kpi('Promedio', k.avg === null ? '—' : k.avg.toFixed(1), '', 'good')}${kpi('Asistencia', k.att === null ? '—' : k.att + '%')}${kpi('Tareas por entregar', tareas().length)}${kpi('Materias', cs.length)}</div>
+  <div class="cols"><div class="card"><h3>Mis materias</h3><div class="ccards">${cs.map(c => `<div class="cc"><div class="bn" style="background:${courseColor(c.materia)}">${courseIcon(c.materia)}</div><div class="bd2"><b>${esc(c.materia)}</b><small>${esc(c.docente)}</small><div class="row"><a class="btn sm" href="#courses">Continuar</a>${ring(courseProgress(me.id, me.grado, c.materia))}</div></div></div>`).join('') || '<div class="empty">Aún no tienes materias.</div>'}</div></div>
+  <div>${entregasCard()}${avisosCard()}${classesOf(db.get('horario').filter(h => h.grado === me.grado))}</div></div>`;
+}
+function parent(root, s) {
+  const me = db.get('students').find(x => x.id === s.sid);
+  if (!me) { root.innerHTML = '<div class="card empty">Aún no hay hijos vinculados a esta cuenta.</div>'; return; }
+  const k = studentStats(me.id), pg = db.get('pagos').filter(p => p.sid === me.id).sort((a, b) => a.fecha.localeCompare(b.fecha)), nx = pg.find(p => p.estado !== 'Pagado');
+  const c = { P: 0, A: 0, T: 0, J: 0 }; db.get('attendance').forEach(r => { const m = r.marks[me.id]; if (m) c[m]++; });
+  const rec = db.get('attendance').filter(r => r.marks[me.id]).sort((a, b) => b.date.localeCompare(a.date))[0];
+  const act = [...posts('tarea').slice(0, 2).map(p => ['📝', 'Nueva tarea', p.titulo + (p.fecha ? ' · entrega ' + p.fecha : '')]), ...posts('anuncio').slice(0, 2).map(p => ['📢', 'Aviso', p.titulo]), ...(rec ? [['✅', 'Asistencia', (rec.marks[me.id] === 'A' ? 'Ausente' : 'Presente') + ' el ' + rec.date]] : [])];
+  const unpaid = new Set(pg.filter(p => p.estado !== 'Pagado').map(p => p.id)), alerts = db.get('notifs').filter(n => n.sid === me.id && unpaid.has(n.clave.split('|')[0])).slice(-2).map(n => `<div class="post tarea"><b>🔔 ${esc(n.asunto)}</b><p style="margin:.2rem 0 0">${esc(n.mensaje)}</p></div>`).join('');
+  root.innerHTML = `<h2 class="pt">Panel familiar · Resumen <span class="sel">Estudiante seleccionado: ${esc(me.nombres)} ${esc(me.apellidos)} (${esc(me.grado)})</span></h2>
+  ${alerts}<div class="kpis">${kpi('Promedio académico', k.avg === null ? '—' : k.avg.toFixed(1), '', 'good')}${kpi('Asistencia actual', k.att === null ? '—' : k.att + '%')}${kpi('Estado de colegiatura', nx ? (nx.estado === 'Vencido' ? 'Vencido' : 'Pendiente') : 'Al día', nx ? '<small>Próximo: ' + esc(nx.desc) + '</small>' : '', nx ? (nx.estado === 'Vencido' ? 'al' : '') : 'good')}${kpi('Novedades', tareas().length + posts('anuncio').length, '<small>Tareas y avisos</small>')}</div>
+  <div class="cols3"><div><div class="card"><h3>Asistencia del período</h3>${donut([[c.P + c.T, '#16a34a'], [c.J, '#f59e0b'], [c.A, '#dc2626']], k.att === null ? '—' : k.att + '%')}<div class="legend"><span><i style="background:#16a34a"></i>Presente ${c.P + c.T}</span><span><i style="background:#f59e0b"></i>Justificada ${c.J}</span><span><i style="background:#dc2626"></i>Ausente ${c.A}</span></div></div>
+  ${entregasCard()}<div class="card"><h3>Boletín</h3><a class="btn" style="background:#f97316" href="#mynotes">Ver boletín de calificaciones</a></div></div>
+  <div class="card"><h3>Actividad reciente de ${esc(me.nombres)}</h3><div class="tl">${act.map(a => `<div><b>${a[0]} ${a[1]}</b><br>${esc(a[2])}</div>`).join('') || '<div class="empty">Sin actividad reciente.</div>'}</div></div>
+  <div>${classesOf(db.get('horario').filter(h => h.grado === me.grado))}${avisosCard()}</div></div>`;
+}
+function dashboard(root, s) {
+  root.addEventListener('click', e => {
+    const r = e.target.closest('[data-t]'); if (!r) return; const p = db.get('posts').find(x => x.id === r.dataset.t); if (!p) return;
+    modal('📝 ' + esc(p.titulo), `${p.aula ? '<span class="chip">' + esc(p.aula.replace('|', ' · ')) + '</span> ' : ''}${p.fecha ? badge('Entrega ' + p.fecha, 'warn') : ''}<p style="white-space:pre-wrap">${esc(p.texto)}</p><small style="color:var(--c-muted)">Publicado por ${esc(p.autor)}</small>${s.role === 'student' ? '<div class="actions"><a class="btn" href="#classroom" onclick="document.querySelector(\'.modal\').remove()">Ir a mis actividades</a></div>' : ''}`);
+  });
+  const again = () => render();
+  const render = () => ({ admin, teacher, student, parent })[s.role](root, s, again);
+  render();
+}
+
+const TABS = {
+  Alumno: [['apellidos', 'Apellidos', 'req'], ['nombres', 'Nombres', 'req'], ['cedula', 'Cédula / ID'], ['codigo', 'Código'], ['usuario', 'Usuario de acceso'], ['correo', 'Correo', 'email'], ['telefono', 'Teléfono', 'tel'], ['sexo', 'Sexo', 'select:Masculino,Femenino'], ['grado', 'Grado y sección', 'req'], ['nacimiento', 'Fecha de nacimiento', 'date'], ['direccion', 'Dirección'], ['estado', 'Estado', 'select:Activo,Inactivo']],
+  Apoderados: [['padre', 'Nombre del padre'], ['padre_tel', 'Teléfono del padre', 'tel'], ['madre', 'Nombre de la madre'], ['madre_tel', 'Teléfono de la madre', 'tel'], ['tutor', 'Tutor / contacto de emergencia'], ['familia', 'Usuario del tutor (acceso)']],
+  Procedencia: [['colegio', 'Colegio de procedencia'], ['ubicacion', 'Ubicación']]
+};
+function students(root, { role }) {
+  const admin = role === 'admin';
+  const draw = () => {
+    root.innerHTML = '<div class="card"><h3>🎓 Alumnos registrados</h3><div id="t"></div></div>';
+    table(root.querySelector('#t'), {
+      rows: db.get('students'), tools: admin ? '<button class="btn" id="new">+ Nuevo alumno</button>' : '',
+      cols: [{ h: '#', f: (r, i) => i }, { h: 'Alumno', f: r => `<div class="profile"><span class="avatar" style="width:34px;height:34px;font-size:.8rem">${initials(r.nombres, r.apellidos)}</span>${esc(r.apellidos)}, ${esc(r.nombres)}</div>` },
+        { h: 'Cédula', f: r => esc(r.cedula) }, { h: 'Código', f: r => esc(r.codigo) }, { h: 'Grado', f: r => esc(r.grado) }, { h: 'Teléfono', f: r => esc(r.telefono) },
+        { h: 'Estado', f: r => badge(r.estado || 'Activo', stateColor[r.estado || 'Activo']) },
+        { h: 'Acciones', f: r => `<button class="btn ghost sm" data-v="${r.id}">👁️</button> ${admin ? `<button class="btn sm" data-e="${r.id}">✏️</button> <button class="btn bad sm" data-x="${r.id}">🗑️</button>` : ''}` }]
+    });
+    root.querySelector('#new')?.addEventListener('click', () => form());
+    root.addEventListener('click', onClick);
+  };
+  const onClick = e => {
+    const b = e.target.closest('[data-v],[data-e],[data-x]'); if (!b) return;
+    const id = b.dataset.v || b.dataset.e || b.dataset.x, r = db.get('students').find(x => x.id === id);
+    if (b.dataset.x && confirm('¿Eliminar este alumno?')) { db.remove('students', id); root.removeEventListener('click', onClick); draw(); }
+    else if (b.dataset.e) form(r);
+    else if (b.dataset.v) modal('Expediente', `<div class="profile"><div class="avatar lg">${initials(r.nombres, r.apellidos)}</div><div><b>${esc(r.nombres)} ${esc(r.apellidos)}</b><br><small>${esc(r.grado)}</small></div></div><hr>` + Object.values(TABS).flat().map(f => r[f[0]] ? `<p><small>${f[1]}</small><br>${esc(r[f[0]])}</p>` : '').join(''));
+  };
+  const form = (r = {}) => {
+    const body = `<div class="tabsb">${Object.keys(TABS).map((k, i) => `<button type="button" data-t="${k}" class="${i ? '' : 'on'}">${k}</button>`).join('')}</div>` + Object.entries(TABS).map(([k, fs], i) => `<div class="form" data-p="${k}" ${i ? 'style="display:none"' : ''}>${fs.map(f => field(f, r[f[0]] ?? '')).join('')}</div>`).join('');
+    const m = modal(r.id ? 'Editar alumno' : 'Nuevo alumno', body, mm => {
+      const d = readForm(mm); if (r.id) db.set('students', db.get('students').map(x => x.id === r.id ? { ...x, ...d } : x)); else db.add('students', d);
+      root.removeEventListener('click', onClick); draw();
+    }, true);
+    m.querySelectorAll('[data-t]').forEach(t => t.onclick = () => { m.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === t)); m.querySelectorAll('[data-p]').forEach(p => p.style.display = p.dataset.p === t.dataset.t ? '' : 'none'); });
+  };
+  draw();
+}
+
+function enroll(root) {
+  const draw = () => {
+    root.innerHTML = '<div class="card"><h3>📋 Matrícula</h3><div id="t"></div></div>';
+    const st = db.get('students'), name = id => { const x = st.find(y => y.id === id); return x ? x.apellidos + ', ' + x.nombres : '(eliminado)'; };
+    table(root.querySelector('#t'), { rows: db.get('matriculas'), tools: '<button class="btn" id="new">+ Matricular alumno</button>',
+      cols: [{ h: '#', f: (r, i) => i }, { h: 'Alumno', f: r => esc(name(r.sid)) }, { h: 'Año', f: r => esc(r.anio) }, { h: 'Grado', f: r => esc(r.grado) }, { h: 'Sección', f: r => esc(r.seccion) }, { h: 'Turno', f: r => esc(r.turno) }, { h: 'Tipo', f: r => badge(r.tipo, 'info') }, { h: '', f: r => `<button class="btn bad sm" data-x="${r.id}">Cancelar</button>` }] });
+    root.querySelector('#new').onclick = () => {
+      if (!st.length) return alert('Primero registra alumnos en Expedientes.');
+      modal('Nueva matrícula', `<div class="form"><label>Alumno<select name="sid">${st.map(x => `<option value="${x.id}">${esc(x.apellidos)}, ${esc(x.nombres)}</option>`).join('')}</select></label><label>Año escolar<input name="anio" value="${esc(db.get('inst', {}).year || '2026-2027')}"></label>
+      <label>Grado<input name="grado" list="gl" required></label><datalist id="gl">${gradeList().map(g => `<option>${esc(g)}</option>`).join('')}</datalist><label>Sección<input name="seccion" placeholder="A"></label>
+      <label>Turno<select name="turno"><option>Matutino</option><option>Vespertino</option></select></label><label>Tipo<select name="tipo"><option>Nuevo ingreso</option><option>Reinscripción</option></select></label></div>`, m => {
+        const d = Object.fromEntries([...m.querySelectorAll('[name]')].map(i => [i.name, i.value])); if (!d.grado.trim()) { alert('Indica el grado.'); return false; }
+        db.add('matriculas', d); db.set('students', db.get('students').map(x => x.id === d.sid ? { ...x, grado: d.grado } : x)); draw();
+      });
+    };
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-x]'); if (b && confirm('¿Cancelar matrícula?')) { db.remove('matriculas', b.dataset.x); draw(); } });
+  draw();
+}
+
+const F = [['nombres', 'Nombres', 'req'], ['apellidos', 'Apellidos', 'req'], ['cedula', 'Cédula'], ['usuario', 'Usuario de acceso'], ['correo', 'Correo', 'email'], ['telefono', 'Teléfono', 'tel'], ['nivel', 'Nivel', 'select:Inicial,Primaria,Secundaria'], ['tipo', 'Tipo de docente', 'select:Titular,Especialista,Auxiliar']];
+function teachers(root, { role }) {
+  let sel = null;
+  const draw = () => {
+    const T = db.get('teachers'), cur = T.find(t => t.id === sel), as = db.get('asignaciones').filter(a => a.tid === sel);
+    root.innerHTML = `<div class="two"><div class="card"><h3>👩‍🏫 Docentes disponibles</h3><div id="t"></div></div>
+      <div class="card"><h3>📚 Grados asignados${cur ? ' · ' + esc(cur.nombres) + ' ' + esc(cur.apellidos) : ''}</h3>
+      ${cur ? `<div class="form"><label>Grado<select id="ag">${gradeList().map(g => `<option>${esc(g)}</option>`).join('')}</select></label><label>Materia<select id="am">${db.get('materias').map(m => `<option>${esc(m.nombre)}</option>`).join('')}</select></label></div>
+      <div class="actions"><button class="btn" id="add">+ Asignar</button></div>
+      <div class="tablewrap"><table><thead><tr><th>Orden</th><th>Grado</th><th>Materia</th><th></th></tr></thead><tbody>${as.map((a, i) => `<tr><td>${i + 1}</td><td>${esc(a.grado)}</td><td>${esc(a.materia)}</td><td><button class="btn bad sm" data-q="${a.id}">Quitar</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">Sin asignaciones</td></tr>'}</tbody></table></div>`
+      : '<div class="empty">Selecciona un docente de la lista para ver y asignar sus grados.</div>'}</div></div>`;
+    table(root.querySelector('#t'), { size: 6, rows: T, tools: '<button class="btn" id="new">+ Nuevo docente</button>',
+      cols: [{ h: 'Apellidos', f: r => esc(r.apellidos) }, { h: 'Nombres', f: r => esc(r.nombres) }, { h: 'Nivel', f: r => esc(r.nivel) }, { h: 'Acción', f: r => `<button class="btn ${r.id === sel ? '' : 'ghost'} sm" data-s="${r.id}">Seleccionar</button> <button class="btn bad sm" data-d="${r.id}">🗑️</button>` }] });
+    root.querySelector('#new').onclick = () => modal('Nuevo docente', `<div class="form">${F.map(f => field(f)).join('')}</div>`, m => { db.add('teachers', readForm(m)); draw(); });
+    root.querySelector('#add')?.addEventListener('click', () => { db.add('asignaciones', { tid: sel, grado: root.querySelector('#ag').value, materia: root.querySelector('#am').value }); draw(); });
+    root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { db.remove('asignaciones', b.dataset.q); draw(); });
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-s],[data-d]'); if (!b) return;
+    if (b.dataset.s) { sel = b.dataset.s; draw(); } else if (confirm('¿Eliminar docente?')) { db.remove('teachers', b.dataset.d); sel = null; draw(); } });
+  draw();
+}
+
+// Aula virtual: tablón de anuncios/tareas (tipo Classroom) + puntos de conducta (tipo ClassDojo)
+const REASONS = [['👏 Participación', 1], ['🤝 Respeto', 1], ['📚 Tarea completa', 2], ['💤 Distracción', -1]];
+function classroom(root, { role, name, tid, sid }) {
+  const staff = role === 'admin' || role === 'teacher';
+  const draw = () => {
+    const students = db.get('students'), posts = db.get('posts').slice().reverse().filter(p => (role !== 'student' && role !== 'parent') || !p.aula || p.aula.split('|')[0] === (db.get('students').find(x => x.id === sid) || {}).grado), points = db.get('points');
+    const board = students.map(s => ({ s, t: points.filter(p => p.studentId === s.id).reduce((a, p) => a + p.delta, 0) })).sort((a, b) => b.t - a.t);
+    const as = db.get('asignaciones').filter(a => a.tid === tid).map(a => [a.grado, a.materia]), ao = (as.length ? as : db.get('aulas').map(a => [a.grado, a.materia])).map(a => `<option value="${esc(a[0])}|${esc(a[1])}">${esc(a[1])} · ${esc(a[0])}</option>`).join('');
+    root.innerHTML = `
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div><div class="card"><h3>📢 Tablón de clase</h3>
+      ${staff ? `<form id="pf" class="form"><label>Tipo<select name="tipo"><option value="anuncio">Anuncio</option><option value="tarea">Tarea</option></select></label>
+        <label>Título<input name="titulo" required></label>
+        <label>Fecha de entrega<input name="fecha" type="date"></label>
+        <label>Aula<select name="aula"><option value="">Todos mis grupos</option>${ao}</select></label>
+        <label style="grid-column:1/-1">Mensaje<textarea name="texto" rows="2"></textarea></label></form>
+        <div class="actions"><button class="btn" id="pub">Publicar</button></div><hr>` : ''}
+      ${posts.map(p => `<div class="post ${esc(p.tipo)}"><b>${p.tipo === 'tarea' ? '📝' : '📣'} ${esc(p.titulo)}</b>${p.aula ? ' <span class="chip">' + esc(p.aula.replace('|', ' · ')) + '</span>' : ''}${p.fecha ? ` <span class="chip">Entrega: ${esc(p.fecha)}</span>` : ''}
+        <p>${esc(p.texto)}</p><small>${esc(p.autor)}</small>${staff ? ` <button class="btn ghost sm" data-dp="${p.id}">Quitar</button>` : ''}</div>`).join('') || '<div class="empty">Sin publicaciones todavía.</div>'}
+    </div></div>
+    <div><div class="card"><h3>⭐ Puntos de clase</h3>
+      ${staff && students.length ? `<select id="st">${students.map(s => `<option value="${s.id}">${esc(s.nombres)} ${esc(s.apellidos)}</option>`).join('')}</select>
+        <div class="actions">${REASONS.map((r, i) => `<button class="btn sm ${r[1] < 0 ? 'bad' : 'ok'}" data-r="${i}">${r[0]} ${r[1] > 0 ? '+' : ''}${r[1]}</button>`).join('')}</div><hr>` : ''}
+      ${board.map((b, i) => `<div class="rank"><span>${['🥇', '🥈', '🥉'][i] || i + 1}</span>${esc(b.s.nombres)} ${esc(b.s.apellidos)}<span class="pts">${b.t}</span></div>`).join('') || '<div class="empty">Registra alumnos para empezar a dar puntos.</div>'}
+    </div></div></div>`;
+    root.querySelector('#pub')?.addEventListener('click', () => {
+      const f = root.querySelector('#pf'); if (!f.reportValidity()) return;
+      db.add('posts', { ...Object.fromEntries(new FormData(f)), autor: name }); draw();
+    });
+    root.querySelectorAll('[data-dp]').forEach(b => b.onclick = () => { db.remove('posts', b.dataset.dp); draw(); });
+    root.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+      const r = REASONS[b.dataset.r]; db.add('points', { studentId: root.querySelector('#st').value, delta: r[1], reason: r[0], date: new Date().toISOString() }); draw();
+    });
+  };
+  draw();
+}
+
+function settings(root) {
+  const i = db.get('inst', {});
+  const f = (k, l, ph = '') => `<label>${l}<input name="${k}" value="${esc(i[k])}" placeholder="${ph}"></label>`;
+  root.innerHTML = `<div class="card"><h3>⚙️ Datos de la institución</h3><form id="f" class="form">
+    ${f('name', 'Nombre del centro', 'Mi Colegio')}${f('director', 'Director/a')}${f('email', 'Correo')}${f('phone', 'Teléfono')}
+    ${f('address', 'Dirección')}${f('municipio', 'Municipio')}${f('provincia', 'Provincia')}${f('pais', 'País', 'República Dominicana')}
+    ${f('year', 'Año escolar activo', '2026-2027')}
+    <label>Logotipo<input type="file" id="logo" accept="image/*"></label></form>
+    <img id="prev" class="logo-prev ${i.logo ? '' : 'hidden'}" src="${i.logo || ''}" alt="Logo">
+    <div class="actions"><button class="btn" id="save">Guardar</button><button class="btn bad" id="reset">Restablecer demo</button></div></div>`;
+  let logo = i.logo || '';
+  root.querySelector('#logo').onchange = e => {
+    const file = e.target.files[0]; if (!file || file.size > 500000) return alert('Imagen máx. 500 KB');
+    const r = new FileReader(); r.onload = () => { logo = r.result; const p = root.querySelector('#prev'); p.src = logo; p.classList.remove('hidden'); }; r.readAsDataURL(file);
+  };
+  root.querySelector('#save').onclick = () => { db.set('inst', { ...Object.fromEntries(new FormData(root.querySelector('#f'))), logo }); location.reload(); };
+  root.querySelector('#reset').onclick = () => { if (confirm('Se borrarán todos los datos locales. ¿Continuar?')) { db.reset(); location.reload(); } };
+}
+
+const DEFS = {
+  niveles: { key: 'niveles', title: '🎚️ Niveles', fields: [['nombre', 'Nivel', 'required placeholder="Ej. Primaria"'], ['descripcion', 'Descripción']] },
+  grados: { key: 'grados', title: '🏫 Grados', fields: [['nombre', 'Grado', 'required placeholder="Ej. 3ro A"'], ['nivel', 'Nivel']] },
+  secciones: { key: 'secciones', title: '🔤 Secciones y aulas', fields: [['grado', 'Grado', 'required'], ['seccion', 'Sección', 'required placeholder="A"'], ['aula', 'Aula'], ['turno', 'Turno', 'placeholder="Matutino"']] },
+  materias: { key: 'materias', title: '📚 Asignaturas', fields: [['nombre', 'Asignatura', 'required'], ['docente', 'Docente']] }
+};
+function academic(root, s) {
+  const keys = DEFS[s.sub] ? [s.sub] : Object.keys(DEFS);
+  root.innerHTML = keys.map(k => `<div id="a-${k}"></div>`).join('');
+  keys.forEach(k => crud(root.querySelector('#a-' + k), DEFS[k]));
+}
+
+function requests(root, s) {
+  const pending = s.sub === 'solicitudes';
+  const draw = () => {
+    const rows = db.get('requests').filter(r => !pending || r.estado === 'Pendiente');
+    root.innerHTML = `<div class="card"><h3>${pending ? '📥 Solicitudes de inscripción' : '✅ Aprobación de inscripciones'}</h3><div id="t"></div></div>`;
+    table(root.querySelector('#t'), { rows, tools: '<button class="btn" id="new">+ Nueva solicitud</button>',
+      cols: [{ h: '#', f: (r, i) => i }, { h: 'Aspirante', f: r => esc(r.nombres) + ' ' + esc(r.apellidos) }, { h: 'Grado', f: r => esc(r.grado) }, { h: 'Fecha', f: r => esc(r.fecha) }, { h: 'Estado', f: r => badge(r.estado, r.estado === 'Aprobado' ? 'ok' : r.estado === 'Rechazado' ? 'bad' : 'warn') },
+        { h: 'Acción', f: r => r.estado === 'Pendiente' ? `<button class="btn ok sm" data-a="${r.id}">Aprobar</button> <button class="btn bad sm" data-r="${r.id}">Rechazar</button>` : '' }] });
+    root.querySelector('#new').onclick = () => modal('Nueva solicitud', `<div class="form">${field(['nombres', 'Nombres', 'req'])}${field(['apellidos', 'Apellidos', 'req'])}<label>Grado solicitado<input name="grado" list="gl" required></label><datalist id="gl">${gradeList().map(g => `<option>${esc(g)}</option>`).join('')}</datalist>${field(['fecha', 'Fecha', 'date'], new Date().toISOString().slice(0, 10))}</div>`, m => { db.add('requests', { ...readForm(m), estado: 'Pendiente' }); draw(); });
+  };
+  root.addEventListener('click', e => {
+    const a = e.target.closest('[data-a],[data-r]'); if (!a) return; const id = a.dataset.a || a.dataset.r, all = db.get('requests'), r = all.find(x => x.id === id);
+    if (a.dataset.a) { db.add('students', { nombres: r.nombres, apellidos: r.apellidos, grado: r.grado, estado: 'Activo', codigo: 'A' + (100 + db.get('students').length) }); }
+    db.set('requests', all.map(x => x.id === id ? { ...x, estado: a.dataset.a ? 'Aprobado' : 'Rechazado' } : x)); db.log(a.dataset.a ? 'Aprobar inscripción' : 'Rechazar inscripción', 'requests'); draw();
+  });
+  draw();
+}
+
+const ST = [['P', 'Presente'], ['A', 'Ausente'], ['T', 'Tardanza'], ['J', 'Justificada']];
+function attendance(root) {
+  const grados = [...new Set(db.get('students').map(s => s.grado).filter(Boolean))];
+  let g = grados[0] || '', d = new Date().toISOString().slice(0, 10);
+  const draw = () => {
+    const list = db.get('students').filter(s => s.grado === g);
+    const marks = db.get('attendance').find(a => a.date === d && a.grado === g)?.marks || {};
+    const hist = db.get('attendance').slice().reverse().slice(0, 10);
+    const cnt = (h, c) => Object.values(h.marks).filter(x => x === c).length;
+    root.innerHTML = `<div class="card"><h3>✅ Registro de asistencia</h3><div class="form">
+      <label>Grado<select id="g">${grados.map(x => `<option ${x === g ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
+      <label>Fecha<input id="d" type="date" value="${d}"></label></div>
+      <div class="tablewrap"><table><thead><tr><th>#</th><th>Alumno</th><th>Estado</th></tr></thead><tbody>
+      ${list.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.apellidos)}, ${esc(s.nombres)}</td><td><select data-s="${s.id}">${ST.map(t => `<option value="${t[0]}" ${(marks[s.id] || 'P') === t[0] ? 'selected' : ''}>${t[1]}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
+      ${list.length ? '<div class="actions"><button class="btn" id="reg">Registrar</button></div>' : '<div class="empty">Registra alumnos con su grado en el módulo Alumnos.</div>'}</div>
+      <div class="card"><h3>Registros anteriores</h3>${hist.map(h => `<div class="rank">${esc(h.date)} · ${esc(h.grado)}<span class="pts">P ${cnt(h, 'P')} · A ${cnt(h, 'A')} · T ${cnt(h, 'T')} · J ${cnt(h, 'J')}</span></div>`).join('') || '<div class="empty">Aún no hay registros.</div>'}</div>`;
+    root.querySelector('#g').onchange = e => { g = e.target.value; draw(); };
+    root.querySelector('#d').onchange = e => { d = e.target.value; draw(); };
+    root.querySelector('#reg')?.addEventListener('click', () => {
+      const m = {}; root.querySelectorAll('[data-s]').forEach(s => m[s.dataset.s] = s.value);
+      db.set('attendance', db.get('attendance').filter(a => !(a.date === d && a.grado === g)).concat({ date: d, grado: g, marks: m })); draw();
+    });
+  };
+  draw();
+}
+
+// El docente define cómo califica cada materia (componentes y %), y decide cuándo mostrar las notas.
+function grades(root, { tid }) {
+  const mine = db.get('asignaciones').filter(a => a.tid === tid).map(a => [a.grado, a.materia]);
+  const aulas = db.get('aulas').map(a => [a.grado, a.materia]);
+  const pairs = mine.length ? mine : aulas.length ? aulas : gradeList().flatMap(g => db.get('materias').map(m => [g, m.nombre]));
+  let ai = 0, p = '1';
+  const draw = () => {
+    if (!pairs.length) { root.innerHTML = '<div class="card empty">Aún no hay aulas. Dirección debe crear grados, materias y asignarte tus cursos.</div>'; return; }
+    const [g, m] = pairs[ai] || pairs[0], cfg = cfgFor(g, m), sum = cfg.reduce((a, c) => a + Number(c[1]), 0), key = `${g}|${m}|${p}`;
+    const saved = db.get('notes', {})[key] || {}, list = db.get('students').filter(s => s.grado === g), vis = !!db.get('evalvis', {})[key];
+    root.innerHTML = `<h2 class="pt">📝 Registro de calificaciones</h2>
+    <div class="card"><div class="form"><label>Aula<select id="a">${pairs.map((x, i) => `<option value="${i}" ${i === ai ? 'selected' : ''}>${esc(x[1])} · ${esc(x[0])}</option>`).join('')}</select></label>
+    <label>Período<select id="p">${['1', '2', '3', '4'].map(x => `<option ${x === p ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div>
+    <h3 style="margin-top:1rem">Cómo calificas ${esc(m)}</h3><div class="hint" style="margin:0 0 .6rem">Tú decides los componentes y su porcentaje (deben sumar 100). Se aplica a esta materia y grado.</div>
+    ${cfg.map((c, i) => `<div class="rank"><input data-n="${i}" value="${esc(c[0])}" style="max-width:230px"><input data-w="${i}" type="number" min="0" max="100" value="${c[1]}" style="width:90px"> %<button class="btn bad sm pts" data-r="${i}" style="margin-left:auto">Quitar</button></div>`).join('')}
+    <div class="actions"><button class="btn ghost sm" id="addc">+ Añadir componente</button><span class="chip" style="background:${sum === 100 ? '#dcfce7' : '#fee2e2'}">Suma: ${sum}%</span></div></div>
+    <div class="card"><h3>Notas · ${p}.° período</h3>
+    <label style="display:flex;flex-direction:row;gap:.5rem;align-items:center;color:var(--c-text)"><input type="checkbox" id="vis" ${vis ? 'checked' : ''} style="width:auto;min-height:0"> <b>Mostrar a estudiantes y familias</b> <small style="color:var(--c-muted)">(mientras no lo marques, ellos no ven notas ni totales)</small></label>
+    <div class="tablewrap"><table><thead><tr><th>Alumno</th>${cfg.map(c => `<th>${esc(c[0])} (${c[1]}%)</th>`).join('')}<th>Total</th></tr></thead><tbody>
+    ${list.map(s => `<tr data-r="${s.id}"><td>${esc(s.apellidos)}, ${esc(s.nombres)}</td>${cfg.map((c, i) => `<td><input type="number" min="0" max="100" data-i="${i}" value="${(saved[s.id] || [])[i] ?? ''}" style="width:78px"></td>`).join('')}<td><b class="t">0</b></td></tr>`).join('') || '<tr><td colspan="9" class="empty">No hay alumnos en este grado.</td></tr>'}</tbody></table></div>
+    <div class="actions"><button class="btn" id="sv">Guardar</button><button class="btn ghost" id="cn">Cancelar</button><span class="chip" id="avg"></span></div></div>`;
+    const calc = () => { let tot = 0, n = 0; root.querySelectorAll('tr[data-r]').forEach(r => { const t = totalOf([...r.querySelectorAll('[data-i]')].map(i => i.value), cfg); r.querySelector('.t').textContent = t.toFixed(1); tot += t; n++; }); root.querySelector('#avg').textContent = 'Promedio del grupo: ' + (n ? (tot / n).toFixed(1) : '0'); };
+    calc(); root.querySelectorAll('[data-i]').forEach(i => i.oninput = calc);
+    const setCfg = c => { const map = db.get('evalmap', {}); map[g + '|' + m] = c; db.set('evalmap', map); draw(); };
+    root.querySelector('#a').onchange = e => { ai = Number(e.target.value); draw(); };
+    root.querySelector('#p').onchange = e => { p = e.target.value; draw(); };
+    root.querySelectorAll('[data-n]').forEach(x => x.onchange = () => setCfg(cfg.map((c, i) => i === Number(x.dataset.n) ? [x.value || 'Componente', c[1]] : c)));
+    root.querySelectorAll('[data-w]').forEach(x => x.onchange = () => setCfg(cfg.map((c, i) => i === Number(x.dataset.w) ? [c[0], Math.max(0, Math.min(100, Number(x.value) || 0))] : c)));
+    root.querySelectorAll('[data-r]:not(tr)').forEach(x => x.onclick = () => { if (cfg.length > 1 && confirm('¿Quitar este componente? Las notas ya escritas podrían desordenarse.')) setCfg(cfg.filter((c, i) => i !== Number(x.dataset.r))); });
+    root.querySelector('#addc').onclick = () => setCfg([...cfg, ['Nuevo componente', 0]]);
+    root.querySelector('#vis').onchange = e => { const v = db.get('evalvis', {}); v[key] = e.target.checked; db.set('evalvis', v); };
+    root.querySelector('#cn').onclick = draw;
+    root.querySelector('#sv').onclick = () => {
+      if (sum !== 100) return alert('Los porcentajes deben sumar 100%.');
+      const out = {}; let bad = false;
+      root.querySelectorAll('tr[data-r]').forEach(r => out[r.dataset.r] = [...r.querySelectorAll('[data-i]')].map(i => { const v = i.value === '' ? '' : Number(i.value); if (v !== '' && (v < 0 || v > 100)) bad = true; return v; }));
+      if (bad) return alert('Las notas deben estar entre 0 y 100.');
+      const all = db.get('notes', {}); all[key] = out; db.set('notes', all); alert('Calificaciones guardadas ✅');
+    };
+  };
+  draw();
+}
+
+function payments(root, s) {
+  const admin = s.role === 'admin';
+  let sid = admin ? db.get('students')[0]?.id : s.sid;
+  const draw = () => {
+    const st = db.get('students'), me = st.find(x => x.id === sid);
+    if (!me) { root.innerHTML = '<div class="card empty">No hay estudiantes registrados todavía.</div>'; return; }
+    const rows = db.get('pagos').filter(p => p.sid === sid).sort((a, b) => a.fecha.localeCompare(b.fecha));
+    const last = rows.filter(r => r.estado === 'Pagado').pop(), nx = rows.find(r => r.estado !== 'Pagado');
+    root.innerHTML = `<h2 class="pt">💳 Pagos</h2>
+    <div class="card profile"><div class="avatar lg">${initials(me.nombres, me.apellidos)}</div><div class="grow"><b style="font-size:1.2rem">${esc(me.apellidos)}, ${esc(me.nombres)}</b><br><small>${esc(me.grado)} · Último pago: ${last ? esc(last.fecha) : '—'}</small><br><small>Próximo pago: ${nx ? esc(nx.desc) + ' (' + esc(nx.fecha) + ')' : 'Sin pendientes'}</small></div>
+      ${nx ? badge(nx.estado === 'Vencido' ? 'PAGO VENCIDO' : 'PAGO PENDIENTE', stateColor[nx.estado]) : badge('AL DÍA', 'ok')}
+      ${admin ? `<select id="st" style="max-width:240px">${st.map(x => `<option value="${x.id}" ${x.id === sid ? 'selected' : ''}>${esc(x.apellidos)}, ${esc(x.nombres)}</option>`).join('')}</select>` : ''}</div>
+    <div class="card"><h3>Lista de pagos realizados y pendientes</h3><div id="t"></div></div>`;
+    table(root.querySelector('#t'), { rows, tools: admin ? '<button class="btn" id="new">+ Registrar cargo</button>' : '',
+      cols: [{ h: 'N°', f: (r, i) => i }, { h: 'Descripción', f: r => esc(r.desc) }, { h: 'Fecha', f: r => esc(r.fecha) }, { h: 'Estado', f: r => badge(r.estado, stateColor[r.estado]) }, { h: 'Monto', f: r => money(r.monto) },
+        { h: admin ? 'Acción' : '', f: r => admin && r.estado !== 'Pagado' ? `<button class="btn ok sm" data-c="${r.id}">Cobrar</button>` : '' }] });
+    root.querySelector('#st')?.addEventListener('change', e => { sid = e.target.value; draw(); });
+    root.querySelector('#new')?.addEventListener('click', () => modal('Registrar cargo', `<div class="form">${[['desc', 'Descripción', 'req'], ['fecha', 'Fecha', 'date'], ['monto', 'Monto (RD$)', 'number'], ['estado', 'Estado', 'select:Pendiente,Pagado,Parcial,Vencido']].map(f => field(f)).join('')}</div>`, m => { db.add('pagos', { ...readForm(m), sid }); draw(); }));
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (b) { db.set('pagos', db.get('pagos').map(p => p.id === b.dataset.c ? { ...p, estado: 'Pagado' } : p)); draw(); } });
+  draw();
+}
+
+function finance(root, s) {
+  const sub = s.sub, TITLE = { ingresos: 'Ingresos', egresos: 'Egresos' }[sub] || 'Resumen financiero';
+  let from = '', to = '';
+  const draw = () => {
+    const all = db.get('movs').slice().sort((a, b) => b.fecha.localeCompare(a.fecha)).filter(m => (!from || m.fecha >= from) && (!to || m.fecha <= to)).filter(m => sub === 'ingresos' ? m.tipo === 'Ingreso' : sub === 'egresos' ? m.tipo === 'Egreso' : true);
+    const sum = (t, f = () => true) => all.filter(m => m.tipo === t && f(m)).reduce((a, m) => a + Number(m.monto), 0);
+    const ing = sum('Ingreso'), egr = sum('Egreso'), porCobrar = db.get('pagos').filter(p => p.estado !== 'Pagado').reduce((a, p) => a + Number(p.monto), 0);
+    const st = (ic, t, v, c) => `<div class="stat s${c}"><div class="ic">${ic}</div><div class="t"><small>${t}</small><b>${v}</b></div></div>`;
+    root.innerHTML = `<h2 class="pt">💰 ${TITLE}</h2><div class="grid">${st('⬇️', 'Ingresos', money(ing), 1)}${st('⬆️', 'Egresos', money(egr), 2)}${st('💲', 'Balance', money(ing - egr), 3)}${st('🧾', 'Por cobrar', money(porCobrar), 4)}</div>
+    <div class="card"><h3>Movimientos</h3><div class="tools"><label>Desde <input type="date" id="f" value="${from}"></label><label>Hasta <input type="date" id="t2" value="${to}"></label>
+    <button class="btn ghost sm" id="csv">Excel</button><button class="btn ghost sm" id="csv2">CSV</button><button class="btn ghost sm" id="pr">PDF</button><button class="btn ghost sm" id="pr2">Imprimir</button></div><div id="t"></div></div>`;
+    table(root.querySelector('#t'), { rows: all, tools: '<button class="btn" id="new">+ Nuevo movimiento</button>',
+      cols: [{ h: 'N°', f: (r, i) => i }, { h: 'Categoría', f: r => esc(r.categoria) }, { h: 'Subcategoría', f: r => esc(r.sub) }, { h: 'Monto', f: r => money(r.monto) }, { h: 'Tipo', f: r => badge(r.tipo, r.tipo === 'Ingreso' ? 'ok' : 'bad') }, { h: 'Fecha', f: r => esc(r.fecha) }, { h: '', f: r => `<button class="btn bad sm" data-x="${r.id}">🗑️</button>` }] });
+    const ex = () => exportCSV('movimientos', ['N°', 'Categoría', 'Subcategoría', 'Monto', 'Tipo', 'Fecha'], all.map((m, i) => [i + 1, m.categoria, m.sub, m.monto, m.tipo, m.fecha]));
+    root.querySelector('#csv').onclick = ex; root.querySelector('#csv2').onclick = ex;
+    root.querySelector('#pr').onclick = () => showPrint(financeHTML(all, from, to)); root.querySelector('#pr2').onclick = () => showPrint(financeHTML(all, from, to));
+    root.querySelector('#f').onchange = e => { from = e.target.value; draw(); };
+    root.querySelector('#t2').onchange = e => { to = e.target.value; draw(); };
+    root.querySelector('#new').onclick = () => modal('Nuevo movimiento', `<div class="form">${[['tipo', 'Tipo', 'select:Ingreso,Egreso'], ['categoria', 'Categoría', 'req'], ['sub', 'Subcategoría'], ['monto', 'Monto (RD$)', 'number'], ['fecha', 'Fecha', 'date']].map(f => field(f)).join('')}</div>`, m => { const d = readForm(m); if (!d.monto || !d.fecha) { alert('Indica monto y fecha.'); return false; } db.add('movs', d); draw(); });
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-x]'); if (b && confirm('¿Eliminar movimiento?')) { db.remove('movs', b.dataset.x); draw(); } });
+  draw();
+}
+
+const WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'], SLOTS = ['08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '13:00 - 14:00', '14:00 - 15:00'];
+const color = t => `hsl(${[...t].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) % 360},55%,42%)`;
+function schedule(root, s) {
+  const admin = s.role === 'admin', me = db.get('students').find(x => x.id === s.sid);
+  let g = (s.role === 'student' || s.role === 'parent') && me ? me.grado : 'Todos';
+  const draw = () => {
+    const H = db.get('horario').filter(h => (g === 'Todos' || h.grado === g) && (s.role !== 'teacher' || h.docente === s.name || g !== 'Todos'));
+    root.innerHTML = `<div class="card"><h3>🗓️ Horario de clases</h3><div class="tools">${s.role === 'student' || s.role === 'parent' ? `<span class="chip">${esc(g)}</span>` : `<select id="g" style="max-width:200px"><option>Todos</option>${gradeList().map(x => `<option ${x === g ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select>`}${admin ? '<button class="btn" id="new">+ Agregar clase</button>' : ''}</div>
+    <div class="tablewrap"><table class="sch"><thead><tr><th>Hora</th>${WEEK.map(d => `<th>${d}</th>`).join('')}</tr></thead><tbody>${SLOTS.map(sl => `<tr><td><b>${sl}</b></td>${WEEK.map((d, i) => `<td>${H.filter(h => h.dia === i + 1 && h.hora === sl).map(h => `<div class="blk" style="background:${color(h.materia)}" ${admin ? `data-x="${h.id}" title="Clic para quitar"` : ''}>${esc(h.materia)}<small>${esc(h.docente)} · ${esc(h.aula)}${g === 'Todos' ? ' · ' + esc(h.grado) : ''}</small></div>`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+    root.querySelector('#g')?.addEventListener('change', e => { g = e.target.value; draw(); });
+    root.querySelector('#new')?.addEventListener('click', () => modal('Nueva clase', `<div class="form"><label>Día<select name="dia">${WEEK.map((d, i) => `<option value="${i + 1}">${d}</option>`).join('')}</select></label><label>Hora<select name="hora">${SLOTS.map(x => `<option>${x}</option>`).join('')}</select></label>
+      <label>Materia<select name="materia">${db.get('materias').map(m => `<option>${esc(m.nombre)}</option>`).join('')}</select></label><label>Docente<select name="docente">${db.get('teachers').map(t => `<option>${esc(t.nombres)} ${esc(t.apellidos)}</option>`).join('')}</select></label>
+      ${field(['aula', 'Aula'])}<label>Grado<select name="grado">${gradeList().map(x => `<option>${esc(x)}</option>`).join('')}</select></label></div>`, m => { const d = readForm(m); db.add('horario', { ...d, dia: Number(d.dia) }); draw(); }));
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-x]'); if (b && confirm('¿Quitar esta clase?')) { db.remove('horario', b.dataset.x); draw(); } });
+  draw();
+}
+
+function mynotes(root, s) {
+  const me = db.get('students').find(x => x.id === s.sid);
+  if (!me) { root.innerHTML = '<div class="card empty">No hay estudiante vinculado todavía.</div>'; return; }
+  let p = '1', sel = null;
+  const draw = () => {
+    const notes = db.get('notes', {}), mats = db.get('materias'), k = studentStats(me.id, true);
+    const raw = m => { const v = (notes[`${me.grado}|${m}|${p}`] || {})[me.id]; return v && v.some(x => x !== '') ? v : null; };
+    const v = sel && raw(sel), pub = sel && isVisible(me.grado, sel, p), cfg = sel ? cfgFor(me.grado, sel) : [];
+    root.innerHTML = `<h2 class="pt">📊 Calificaciones · ${esc(me.nombres)} ${esc(me.apellidos)}</h2>
+    <div class="card"><div class="pills">${[1, 2, 3, 4].map(n => `<button class="pill c${n} ${String(n) === p ? 'on' : ''}" data-p="${n}">${n}.° Período</button>`).join('')}<span class="chip" style="margin-left:auto">Promedio general: ${k.avg === null ? '—' : k.avg.toFixed(1)}</span></div>
+    <div class="grid">${mats.map(m => { const d = raw(m.nombre), vis = isVisible(me.grado, m.nombre, p); return `<div class="course ${sel === m.nombre ? 'on' : ''}" data-m="${esc(m.nombre)}"><b>${esc(m.nombre)}</b><br><small>${esc(m.docente || '')}</small><br>${!d ? badge('Evaluación pendiente', 'warn') : !vis ? badge('Notas aún no publicadas', 'gray') : badge('Total: ' + totalOf(d, cfgFor(me.grado, m.nombre)).toFixed(1), totalOf(d, cfgFor(me.grado, m.nombre)) >= 70 ? 'ok' : 'bad')}</div>`; }).join('') || '<div class="empty">Aún no hay materias.</div>'}</div></div>
+    ${sel ? `<div class="card"><h3>${esc(sel)}</h3>${v && pub ? `<div class="tablewrap"><table><thead><tr><th>N°</th><th>Actividad</th><th>Porcentaje</th><th>Nota</th></tr></thead><tbody>${cfg.map((c, i) => `<tr><td>${i + 1}</td><td>${esc(c[0])}</td><td>${badge(c[1] + '%', 'info')}</td><td>${v[i] === '' || v[i] === undefined ? '—' : v[i]}</td></tr>`).join('')}</tbody></table></div><p><b>Total ponderado acumulado: ${totalOf(v, cfg).toFixed(1)}</b></p>` : v ? '<div class="empty">Tu docente aún no ha publicado las notas de este período.</div>' : '<div class="empty">Materia con evaluación pendiente.</div>'}</div>` : ''}
+    <div class="actions"><button class="btn" id="pb">🖨️ Boletín imprimible</button></div>`;
+    root.querySelector('#pb').onclick = () => showPrint(boletinHTML(me, false));
+  };
+  root.addEventListener('click', e => { const a = e.target.closest('[data-p]'), b = e.target.closest('[data-m]'); if (a) { p = a.dataset.p; sel = null; draw(); } else if (b) { sel = b.dataset.m; draw(); } });
+  draw();
+}
+
+function courses(root, s) {
+  const me = db.get('students').find(x => x.id === s.sid);
+  if (!me) { root.innerHTML = '<div class="card empty">Aún no hay estudiante vinculado.</div>'; return; }
+  const cs = myCourses(me.grado); let sel = cs[0]?.materia, p = '1';
+  const draw = () => {
+    const cfg = sel ? cfgFor(me.grado, sel) : [], d = (db.get('notes', {})[`${me.grado}|${sel}|${p}`] || {})[me.id], pub = isVisible(me.grado, sel, p);
+    root.innerHTML = `<h2 class="pt">📖 Mis materias</h2><div class="cols"><div class="card"><div class="ccards">${cs.map(c => `<div class="cc ${c.materia === sel ? 'on' : ''}"><div class="bn" style="background:${courseColor(c.materia)}">${courseIcon(c.materia)}</div><div class="bd2"><b>${esc(c.materia)}</b><small>${esc(c.docente)}</small><div class="row"><button class="btn sm" data-c="${esc(c.materia)}">Continuar</button>${ring(courseProgress(me.id, me.grado, c.materia))}</div></div></div>`).join('') || '<div class="empty">Aún no tienes materias.</div>'}</div></div>
+    <div class="card"><h3>${esc(sel || 'Materia')}</h3><div class="pills">${[1, 2, 3, 4].map(n => `<button class="pill c${n} ${String(n) === p ? 'on' : ''}" data-p="${n}">${n}.° período</button>`).join('')}</div>
+    ${cfg.map((c, i) => { const v = d && d[i] !== undefined && d[i] !== '' ? d[i] : null; return `<div class="chk ${v !== null ? 'done' : ''}"><span class="box">${v !== null ? '✓' : ''}</span><span class="grow">${esc(c[0])} <small style="color:var(--c-muted)">(${c[1]}%)</small></span>${v === null ? badge('Pendiente', 'warn') : pub ? badge(String(v), 'ok') : badge('Registrada', 'gray')}</div>`; }).join('')}
+    <div class="actions"><a class="btn sm" href="#classroom">Ver tareas</a></div></div></div>`;
+  };
+  root.addEventListener('click', e => { const c = e.target.closest('[data-c]'), q = e.target.closest('[data-p]'); if (c) { sel = c.dataset.c; draw(); } else if (q) { p = q.dataset.p; draw(); } });
+  draw();
+}
+
+function avisos(root, s) {
+  const staff = s.role === 'admin' || s.role === 'teacher';
+  const draw = () => {
+    const L = db.get('posts').filter(p => p.tipo === 'anuncio').slice().reverse();
+    root.innerHTML = `<h2 class="pt">📢 Avisos institucionales</h2><div class="card"><div class="tools"><b class="grow">Comunicados</b>${staff ? '<button class="btn" id="new">+ Nuevo aviso</button>' : ''}</div>
+      ${L.map(a => `<div class="post"><b>${esc(a.titulo)}</b><p>${esc(a.texto)}</p><small>${esc(a.autor)} · ${esc(a.fecha || '')}</small>${staff ? ` <button class="btn bad sm" data-x="${a.id}">Eliminar</button>` : ''}</div>`).join('') || '<div class="empty">No hay avisos por ahora.</div>'}</div>`;
+    root.querySelector('#new')?.addEventListener('click', () => modal('Publicar aviso', `<div class="form" style="grid-template-columns:1fr">${field(['titulo', 'Título', 'req'])}<label>Contenido<textarea name="texto" rows="4"></textarea></label>${field(['fecha', 'Fecha', 'date'], new Date().toISOString().slice(0, 10))}</div>`, m => { db.add('posts', { ...readForm(m), tipo: 'anuncio', autor: s.name }); draw(); }));
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-x]'); if (b && confirm('¿Eliminar aviso?')) { db.remove('posts', b.dataset.x); draw(); } });
+  draw();
+}
+
+// Dirección: SOLO CONSULTA. Las notas y la asistencia las registra el docente.
+function reports(root) {
+  let tab = 'notas', g = gradeList()[0] || '', m = db.get('materias')[0]?.nombre || '', p = '1', from = '', to = '';
+  const opt = (a, v) => a.map(x => `<option ${x === v ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  const draw = () => {
+    const cfg = cfgFor(g, m), st = db.get('students').filter(x => x.grado === g);
+    let rows, cols, csv;
+    if (tab === 'notas') {
+      const data = db.get('notes', {})[`${g}|${m}|${p}`] || {};
+      rows = st.map(x => { const v = data[x.id]; const t = v && v.some(n => n !== '') ? v.reduce((a, n, i) => a + (Number(n) || 0) * (cfg[i] ? cfg[i][1] : 0) / 100, 0) : null; return { x, v, t }; });
+      cols = [{ h: '#', f: (r, i) => i }, { h: 'Alumno', f: r => esc(r.x.apellidos) + ', ' + esc(r.x.nombres) }, ...cfg.map((c, i) => ({ h: esc(c[0]), f: r => r.v && r.v[i] !== '' && r.v[i] !== undefined ? r.v[i] : '—' })), { h: 'Total', f: r => r.t === null ? badge('Pendiente', 'warn') : badge(r.t.toFixed(1), r.t >= 70 ? 'ok' : 'bad') }];
+      csv = () => exportCSV('reporte-notas', ['Alumno', ...cfg.map(c => c[0]), 'Total'], rows.map(r => [r.x.apellidos + ' ' + r.x.nombres, ...cfg.map((c, i) => r.v ? r.v[i] : ''), r.t === null ? '' : r.t.toFixed(1)]));
+    } else {
+      rows = st.map(x => { const c = { P: 0, A: 0, T: 0, J: 0 }; db.get('attendance').filter(r => r.grado === g && (!from || r.date >= from) && (!to || r.date <= to)).forEach(r => { const k = r.marks[x.id]; if (k) c[k]++; }); const tot = c.P + c.A + c.T + c.J; return { x, c, pct: tot ? Math.round((c.P + c.T) * 100 / tot) : null }; });
+      cols = [{ h: '#', f: (r, i) => i }, { h: 'Alumno', f: r => esc(r.x.apellidos) + ', ' + esc(r.x.nombres) }, { h: 'Presente', f: r => r.c.P }, { h: 'Ausente', f: r => r.c.A }, { h: 'Tardanza', f: r => r.c.T }, { h: 'Justificada', f: r => r.c.J }, { h: '% asistencia', f: r => r.pct === null ? '—' : badge(r.pct + '%', r.pct >= 85 ? 'ok' : 'bad') }];
+      csv = () => exportCSV('reporte-asistencia', ['Alumno', 'Presente', 'Ausente', 'Tardanza', 'Justificada', '%'], rows.map(r => [r.x.apellidos + ' ' + r.x.nombres, r.c.P, r.c.A, r.c.T, r.c.J, r.pct ?? '']));
+    }
+    root.innerHTML = `<h2 class="pt">📑 Reportes de notas y asistencia</h2><div class="card"><div class="hint" style="margin:0 0 1rem">Solo consulta: las calificaciones y la asistencia las registra cada docente desde su panel.</div>
+      <div class="tabsb"><button data-t="notas" class="${tab === 'notas' ? 'on' : ''}">Calificaciones</button><button data-t="asist" class="${tab === 'asist' ? 'on' : ''}">Asistencia</button></div>
+      <div class="form"><label>Grado<select id="g">${opt(gradeList(), g)}</select></label>
+      ${tab === 'notas' ? `<label>Materia<select id="m">${opt(db.get('materias').map(x => x.nombre), m)}</select></label><label>Período<select id="p">${opt(['1', '2', '3', '4'], p)}</select></label>` : `<label>Desde<input type="date" id="f" value="${from}"></label><label>Hasta<input type="date" id="t2" value="${to}"></label>`}</div>
+      <div id="t"></div></div>
+      <div class="card"><h3>🖨️ Boletín individual</h3><div class="form"><label>Alumno de ${esc(g)}<select id="bs">${st.map(x => `<option value="${x.id}">${esc(x.apellidos)}, ${esc(x.nombres)}</option>`).join('')}</select></label></div><div class="actions"><button class="btn" id="bp">Ver y imprimir boletín</button></div></div>`;
+    table(root.querySelector('#t'), { rows, cols, tools: '<button class="btn ghost sm" id="csv">Excel / CSV</button><button class="btn ghost sm" onclick="print()">Imprimir</button>' });
+    root.querySelector('#csv').onclick = csv;
+    const bind = (id, fn) => { const e = root.querySelector(id); if (e) e.onchange = ev => { fn(ev.target.value); draw(); }; };
+    root.querySelector('#bp').onclick = () => { const x = st.find(y => y.id === root.querySelector('#bs').value); if (x) showPrint(boletinHTML(x, true)); else alert('No hay alumnos en este grado.'); };
+    bind('#g', v => g = v); bind('#m', v => m = v); bind('#p', v => p = v); bind('#f', v => from = v); bind('#t2', v => to = v);
+    root.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { tab = b.dataset.t; draw(); });
+  };
+  draw();
+}
+
+const ATT_LABEL = { P: ['Presente', 'ok'], A: ['Ausente', 'bad'], T: ['Tardanza', 'warn'], J: ['Justificada', 'info'] };
+function myatt(root, s) {
+  const me = db.get('students').find(x => x.id === s.sid);
+  if (!me) { root.innerHTML = '<div class="card empty">No hay estudiante vinculado todavía.</div>'; return; }
+  const rows = db.get('attendance').filter(r => r.marks[me.id]).sort((a, b) => b.date.localeCompare(a.date)).map(r => ({ date: r.date, st: r.marks[me.id] }));
+  const k = studentStats(me.id);
+  root.innerHTML = `<h2 class="pt">✅ Asistencia · ${esc(me.nombres)} ${esc(me.apellidos)}</h2>
+    <div class="grid"><div class="stat s5"><div class="ic">✅</div><div class="t"><small>Asistencia general</small><b>${k.att === null ? '—' : k.att + '%'}</b></div></div><div class="stat s1"><div class="ic">📅</div><div class="t"><small>Días registrados</small><b>${rows.length}</b></div></div></div>
+    <div class="card"><h3>Historial</h3><div id="t"></div></div>`;
+  table(root.querySelector('#t'), { rows, cols: [{ h: '#', f: (r, i) => i }, { h: 'Fecha', f: r => esc(r.date) }, { h: 'Estado', f: r => badge(ATT_LABEL[r.st][0], ATT_LABEL[r.st][1]) }] });
+}
+
+function audit(root) {
+  root.innerHTML = '<div class="card"><h3>🛡️ Auditoría</h3><p style="color:var(--c-muted)">Registro de acciones realizadas en este dispositivo (crear, eliminar, aprobar).</p><div id="t"></div></div>';
+  table(root.querySelector('#t'), { size: 10, rows: db.get('audit', []).slice().reverse(), cols: [{ h: '#', f: (r, i) => i }, { h: 'Fecha y hora', f: r => esc(r.fecha.replace('T', ' ').slice(0, 16)) }, { h: 'Usuario', f: r => esc(r.usuario) }, { h: 'Acción', f: r => badge(r.accion, r.accion.startsWith('Elim') || r.accion.startsWith('Rech') ? 'bad' : 'ok') }, { h: 'Módulo', f: r => esc(r.modulo) }] });
+}
+
+// Dirección: supervisa TODAS las aulas virtuales (solo consulta)
+function classrooms(root) {
+  let sel = null;
+  const stats = a => {
+    const st = db.get('students').filter(x => x.grado === a.grado), cfg = cfgFor(a.grado, a.materia), notes = db.get('notes', {}), id = a.grado + '|' + a.materia;
+    const avgOf = sid => { const t = []; for (let p = 1; p <= 4; p++) { const v = (notes[`${id}|${p}`] || {})[sid]; if (v && v.some(x => x !== '')) t.push(v.reduce((s, x, i) => s + (Number(x) || 0) * (cfg[i] ? cfg[i][1] : 0) / 100, 0)); } return t.length ? t.reduce((x, y) => x + y, 0) / t.length : null; };
+    const av = st.map(x => avgOf(x.id)).filter(v => v !== null);
+    return { st, avgOf, avg: av.length ? av.reduce((x, y) => x + y, 0) / av.length : null, posts: db.get('posts').filter(p => p.aula === id) };
+  };
+  const draw = () => {
+    const aulas = db.get('aulas').map(a => ({ ...a, ...stats(a) })), cur = aulas.find(a => a.id === sel);
+    root.innerHTML = `<h2 class="pt">🏫 Aulas virtuales · supervisión</h2><div class="card"><div class="hint" style="margin:0 0 1rem">Vista de solo consulta para Dirección. Las aulas se crean desde el Dashboard y cada docente publica en las suyas.</div><div id="t"></div></div>
+    ${cur ? `<div class="cols"><div class="card"><h3>${courseIcon(cur.materia)} ${esc(cur.materia)} · ${esc(cur.grado)}</h3><p style="margin-top:0">Docente: <b>${esc(cur.docente)}</b></p>
+      <div class="tablewrap"><table><thead><tr><th>Alumno</th><th>Promedio de la materia</th></tr></thead><tbody>${cur.st.map(x => { const v = cur.avgOf(x.id); return `<tr><td>${esc(x.apellidos)}, ${esc(x.nombres)}</td><td>${v === null ? badge('Pendiente', 'warn') : badge(v.toFixed(1), v >= 70 ? 'ok' : 'bad')}</td></tr>`; }).join('') || '<tr><td colspan="2" class="empty">Sin alumnos en este grado</td></tr>'}</tbody></table></div></div>
+      <div class="card"><h3>Actividad del aula</h3>${cur.posts.slice().reverse().map(p => `<div class="post ${esc(p.tipo)}"><b>${p.tipo === 'tarea' ? '📝' : '📣'} ${esc(p.titulo)}</b> ${p.fecha ? badge('Entrega ' + p.fecha, 'warn') : ''}<p style="margin:.2rem 0 0">${esc(p.texto)}</p></div>`).join('') || '<div class="empty">El docente aún no ha publicado en esta aula.</div>'}</div></div>` : ''}`;
+    table(root.querySelector('#t'), { rows: aulas, size: 6, cols: [{ h: 'Aula', f: r => courseIcon(r.materia) + ' <b>' + esc(r.materia) + '</b>' }, { h: 'Grado', f: r => esc(r.grado) }, { h: 'Docente', f: r => esc(r.docente) }, { h: 'Alumnos', f: r => r.st.length }, { h: 'Publicaciones', f: r => r.posts.length }, { h: 'Promedio', f: r => r.avg === null ? '—' : r.avg.toFixed(1) }, { h: '', f: r => `<button class="btn sm ${r.id === sel ? '' : 'ghost'}" data-v="${r.id}">Ver detalle</button>` }] });
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (b) { sel = b.dataset.v; draw(); } });
+  draw();
+}
+
+function notifs(root) {
+  const draw = () => {
+    const cfg = notifCfg(), st = db.get('students'), unpaid = new Set(db.get('pagos').filter(p => p.estado !== 'Pagado').map(p => p.id));
+    const rows = db.get('notifs').slice().reverse().map(n => { const s = st.find(x => x.id === n.sid) || {}, tel = String(s.madre_tel || s.padre_tel || '').replace(/\D/g, ''); return { ...n, alumno: s.nombres ? s.nombres + ' ' + s.apellidos : '(eliminado)', wa: tel ? 'https://wa.me/' + (tel.length === 10 ? '1' + tel : tel) + '?text=' + encodeURIComponent(n.mensaje) : '', resuelta: !unpaid.has(n.clave.split('|')[0]) }; });
+    root.innerHTML = `<h2 class="pt">🔔 Notificaciones automáticas a las familias</h2>
+    <div class="card"><h3>Reglas</h3><div class="hint" style="margin:0 0 1rem">El sistema revisa los pagos cada vez que alguien abre la plataforma y deja el recordatorio listo. Las familias lo ven en la campana 🔔. El envío automático real por correo o WhatsApp se activa al conectar el servidor; mientras tanto puedes enviarlo con el botón WhatsApp.</div>
+    <div class="form"><label>Días de anticipación<input id="dias" type="number" min="0" max="30" value="${cfg.dias}"></label><label>Avisar pagos vencidos<select id="venc"><option value="1" ${cfg.vencidos ? 'selected' : ''}>Sí</option><option value="0" ${cfg.vencidos ? '' : 'selected'}>No</option></select></label>
+    <div><small style="color:var(--c-muted)">Canales</small><div style="display:flex;gap:1rem;flex-wrap:wrap;padding-top:.6rem">${['App', 'Correo', 'WhatsApp'].map(c => `<label style="flex-direction:row;gap:.3rem;align-items:center;color:var(--c-text)"><input type="checkbox" data-c="${c}" ${cfg.canales.includes(c) ? 'checked' : ''} style="width:auto;min-height:0"> ${c}</label>`).join('')}</div></div>
+    <label style="grid-column:1/-1">Mensaje · pago próximo<textarea id="pl1" rows="2">${esc(cfg.plantilla)}</textarea></label><label style="grid-column:1/-1">Mensaje · pago vencido<textarea id="pl2" rows="2">${esc(cfg.plantillaVencido)}</textarea></label></div>
+    <small style="color:var(--c-muted)">Variables: {tutor} {alumno} {concepto} {fecha} {monto}</small><div class="actions"><button class="btn" id="save">Guardar reglas</button><button class="btn ghost" id="scan">Revisar vencimientos ahora</button></div></div>
+    <div class="card"><h3>Cola de mensajes</h3><div id="t"></div></div>`;
+    table(root.querySelector('#t'), { rows, size: 6, cols: [{ h: 'Fecha', f: r => esc(r.creada) }, { h: 'Alumno', f: r => esc(r.alumno) }, { h: 'Tipo', f: r => badge(r.tipo, r.tipo === 'Pago vencido' ? 'bad' : 'warn') }, { h: 'Mensaje', f: r => `<small>${esc(r.mensaje)}</small>` }, { h: 'Canales', f: r => esc((r.canales || []).join(', ')) },
+      { h: 'Estado', f: r => r.resuelta ? badge('Resuelta (pagado)', 'ok') : badge(r.estado, r.estado === 'Enviada' ? 'ok' : 'info') },
+      { h: 'Acción', f: r => `${r.wa ? `<a class="btn ok sm" target="_blank" rel="noopener" href="${esc(r.wa)}">WhatsApp</a> ` : ''}${r.estado !== 'Enviada' ? `<button class="btn ghost sm" data-s="${r.id}">Marcar enviada</button> ` : ''}<button class="btn bad sm" data-x="${r.id}">🗑️</button>` }] });
+    root.querySelector('#save').onclick = () => { db.set('notifcfg', { dias: Number(root.querySelector('#dias').value) || 0, vencidos: root.querySelector('#venc').value === '1', canales: [...root.querySelectorAll('[data-c]')].filter(c => c.checked).map(c => c.dataset.c), plantilla: root.querySelector('#pl1').value, plantillaVencido: root.querySelector('#pl2').value }); alert('Reglas guardadas.'); draw(); };
+    root.querySelector('#scan').onclick = () => { const n = scanPayments(); alert(n ? n + ' recordatorio(s) nuevo(s) en la cola.' : 'No hay recordatorios nuevos.'); draw(); };
+  };
+  root.addEventListener('click', e => { const b = e.target.closest('[data-s],[data-x]'); if (!b) return; if (b.dataset.s) db.set('notifs', db.get('notifs').map(n => n.id === b.dataset.s ? { ...n, estado: 'Enviada' } : n)); else db.remove('notifs', b.dataset.x); draw(); });
+  draw();
+}
+
+
+const pages = { dashboard, students, enroll, teachers, schedule, academic, requests, payments, finance, avisos, reports, settings, audit, attendance, grades, classroom, courses, mynotes, myatt, classrooms, notifs };
+const app = document.getElementById('app'), KEY = 'eduplat:session';
+const session = () => { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch { return null; } };
+const keysOf = r => MENUS[r].flatMap(it => it.c ? it.c.map(c => c[0]) : [it.k]);
+
+function login() {
+  const last = (() => { try { return localStorage.getItem('eduplat:lastuser') || ''; } catch { return ''; } })();
+  app.innerHTML = `<div class="lg2"><div class="brandp"><div class="mark">S$</div><h1>Sistema de Gestión Escolar</h1><p>Un solo lugar para dirección, docentes, estudiantes y familias.</p>
+    <ul><li>✔ Matrícula, expedientes y aulas virtuales</li><li>✔ Asistencia y calificaciones en línea</li><li>✔ Pagos y contabilidad</li><li>✔ Una vista distinta para cada rol</li></ul></div>
+    <div class="fp"><div class="fb"><h2>Iniciar sesión</h2><p>Ingresa con tu usuario y contraseña.</p>
+    <form id="lf" class="form" style="grid-template-columns:1fr" autocomplete="off"><label>Usuario<input name="u" value="${esc(last)}" placeholder="Ej. admin" autofocus></label>
+    <label>Contraseña<div class="pw"><input name="p" id="p" type="password" placeholder="••••••••"><button type="button" id="eye" title="Mostrar contraseña">👁️</button></div></label>
+    <label class="ck"><input type="checkbox" name="rem" ${last ? 'checked' : ''}> Recordarme</label><div class="err" id="err"></div><button class="btn" style="min-height:46px">Ingresar</button></form>
+    <details><summary>Usuarios de demostración</summary><p style="margin:.5rem 0 0">admin / admin1234<br>docente / docente1234<br>estudiante / estudiante1234<br>padre / padre1234</p></details></div></div></div>`;
+  app.querySelector('#eye').onclick = () => { const p = app.querySelector('#p'); p.type = p.type === 'password' ? 'text' : 'password'; };
+  app.querySelector('#lf').onsubmit = e => {
+    e.preventDefault(); const d = new FormData(e.target), u = String(d.get('u')).trim().toLowerCase(), f = DEMO_USERS.find(x => x.u === u && x.p === d.get('p'));
+    if (!u || !d.get('p')) return app.querySelector('#err').textContent = 'Escribe tu usuario y contraseña.';
+    if (!f) return app.querySelector('#err').textContent = 'Usuario o contraseña incorrectos.';
+    try { d.get('rem') ? localStorage.setItem('eduplat:lastuser', u) : localStorage.removeItem('eduplat:lastuser'); } catch { /* sin almacenamiento */ }
+    sessionStorage.setItem(KEY, JSON.stringify({ role: f.role, name: f.name, user: f.u })); location.hash = ''; route();
+  };
+}
+
+// Vincula la sesión con los registros guardados (alumno, hijos, docente)
+function refresh(s) {
+  const st = db.get('students'), t = db.get('teachers');
+  if (s.role === 'parent') { s.kids = st.filter(x => x.familia === s.user).map(x => x.id); if (!s.kids.length && st[0]) s.kids = [st[0].id]; if (!s.kids.includes(s.sid)) s.sid = s.kids[0]; }
+  else if (s.role === 'student') { const m = st.find(x => x.usuario === s.user) || st[0]; s.sid = m?.id; if (m) s.name = m.nombres + ' ' + m.apellidos; }
+  else if (s.role === 'teacher') { const m = t.find(x => x.usuario === s.user) || t[0]; s.tid = m?.id; if (m) s.name = m.nombres + ' ' + m.apellidos; }
+  db.user = s.name; sessionStorage.setItem(KEY, JSON.stringify(s));
+}
+
+function nav(role) {
+  return MENUS[role].map(it => it.c
+    ? `<div class="grp"><button class="gh" type="button"><span>${it.i}</span><span>${it.l}</span><i>▾</i></button><div class="gc">${it.c.map(c => `<a href="#${c[0]}${c[2] ? '/' + c[2] : ''}" data-k="${c[0]}" data-s="${c[2] || ''}">${c[1]}</a>`).join('')}</div></div>`
+    : `<a class="top1" href="#${it.k}" data-k="${it.k}" data-s=""><span>${it.i}</span><span>${it.l}</span></a>`).join('');
+}
+
+function shell(s) {
+  const inst = db.get('inst', {}), nm = esc(inst.name || 'Education Platform');
+  app.innerHTML = `<aside class="side"><div class="brand">${inst.logo ? `<img src="${inst.logo}" alt="">` : '<span class="avatar" style="width:34px;height:34px;font-size:.85rem">S$</span>'} <span>${nm}</span></div>
+    <div class="user"><div class="avatar" id="av"></div><div><b id="un"></b><small>● Online</small></div></div>
+    <input class="sq" id="sq" placeholder="🔍 Buscar en el menú..."><nav>${nav(s.role)}</nav></aside><div class="ov" id="ov"></div>
+    <div class="main"><header class="top"><button class="iconbtn" id="burger">☰</button><strong>${nm}</strong><span class="chip">${esc(inst.year || '2026-2027')}</span><span class="grow"></span>
+    ${s.role === 'parent' ? '<select id="kidsel" title="Hijo/a"></select>' : ''}<button class="iconbtn" id="bell" title="Notificaciones">🔔</button><span class="chip hide" id="rc"></span><button class="btn ghost sm" id="out">Cerrar sesión</button></header><main id="view"></main></div>`;
+  const q = app.querySelector('#sq');
+  q.oninput = () => { const t = q.value.toLowerCase(); app.querySelectorAll('nav a').forEach(a => a.style.display = !t || a.textContent.toLowerCase().includes(t) ? '' : 'none');
+    app.querySelectorAll('.grp').forEach(g => { const any = [...g.querySelectorAll('a')].some(a => a.style.display !== 'none'); g.style.display = any ? '' : 'none'; if (t && any) g.classList.add('open'); }); };
+  app.querySelectorAll('.gh').forEach(b => b.onclick = () => b.parentElement.classList.toggle('open'));
+  app.querySelector('#burger').onclick = () => document.body.classList.toggle('nav');
+  app.querySelector('#ov').onclick = () => document.body.classList.remove('nav');
+  app.querySelector('#bell').onclick = () => { const x = session() || s, unpaid = new Set(db.get('pagos').filter(p => p.estado !== 'Pagado').map(p => p.id));
+    const nt = x.role === 'parent' ? db.get('notifs').filter(n => (x.kids || []).includes(n.sid) && unpaid.has(n.clave.split('|')[0])).reverse().map(n => `<div class="post tarea"><b>🔔 ${esc(n.asunto)}</b><p style="margin:.2rem 0 0">${esc(n.mensaje)}</p></div>`).join('') : '';
+    modal('Notificaciones', nt + db.get('posts').slice(-6).reverse().map(p => `<div class="post ${esc(p.tipo)}"><b>${esc(p.titulo)}</b><p style="margin:.2rem 0 0">${esc(p.texto)}</p></div>`).join('') || '<div class="empty">No hay notificaciones.</div>'); };
+  app.querySelector('#out').onclick = () => { sessionStorage.removeItem(KEY); document.body.classList.remove('nav'); route(); };
+  app.querySelector('#kidsel')?.addEventListener('change', e => { const x = session(); x.sid = e.target.value; sessionStorage.setItem(KEY, JSON.stringify(x)); route(); });
+}
+
+const ROLE_LABEL = { admin: 'Dirección', teacher: 'Docente', student: 'Estudiante', parent: 'Madre / Tutor' };
+function route() {
+  const s = session(); if (!s || !MENUS[s.role]) return login();
+  refresh(s);
+  try { scanPayments(); } catch { /* sin datos */ }
+  if (!document.getElementById('view')) shell(s);
+  document.body.classList.remove('nav');
+  app.querySelector('#un').textContent = s.name; app.querySelector('#av').textContent = initials(s.name.split(' ')[0], s.name.split(' ')[1]); app.querySelector('#rc').textContent = ROLE_LABEL[s.role];
+  const ks = app.querySelector('#kidsel'); if (ks) { const st = db.get('students'); ks.innerHTML = (s.kids || []).map(id => { const x = st.find(y => y.id === id); return x ? `<option value="${id}" ${id === s.sid ? 'selected' : ''}>${esc(x.nombres)} ${esc(x.apellidos)} · ${esc(x.grado)}</option>` : ''; }).join('') || '<option>Sin hijos vinculados</option>'; }
+  const [k, sub = ''] = location.hash.slice(1).split('/'), key = keysOf(s.role).includes(k) ? k : 'dashboard';
+  document.querySelectorAll('.side a').forEach(a => { const on = a.dataset.k === key && a.dataset.s === sub; a.classList.toggle('on', on); if (on) a.closest('.grp')?.classList.add('open'); });
+  const v = document.getElementById('view'), fresh = v.cloneNode(false); v.replaceWith(fresh); // limpia eventos de la pantalla anterior
+  try { pages[key](fresh, { ...s, sub }); } catch (e) { fresh.innerHTML = `<div class="card"><h3>⚠️ Ocurrió un error en esta pantalla</h3><p>${esc(e.message)}</p><button class="btn" onclick="location.hash='';location.reload()">Volver al inicio</button></div>`; }
+}
+addEventListener('hashchange', route);
+try { route(); } catch (e) { app.innerHTML = `<div style="padding:2rem"><h3>⚠️ Error al iniciar</h3><p>${esc(e.message)}</p><button onclick="sessionStorage.clear();location.reload()">Reiniciar sesión</button></div>`; }
+
+</script></body></html>
